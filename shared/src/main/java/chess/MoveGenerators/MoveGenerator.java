@@ -15,6 +15,16 @@ public abstract class MoveGenerator {
         return getPosition(start,slope,magnitude);
     }
 
+    public boolean pawnGetAndCheck(ChessPosition destination,ChessBoard board,ChessPiece self){
+        if (getAndCheck(destination,board,self)){
+            if(board.getPiece(destination) == null){
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
     public boolean getAndCheck(ChessPosition destination,ChessBoard board,ChessPiece self){
         if (!board.isValid(destination)){
             return false;
