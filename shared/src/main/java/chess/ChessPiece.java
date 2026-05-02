@@ -21,11 +21,11 @@ public class ChessPiece {
         this.pieceColor = pieceColor;
         this.type = type;
         generator = switch (this.type){
-            case KING -> null;
-            case QUEEN -> null;
+            case KING -> new KingMoveGenerator();
+            case QUEEN -> new QueenMoveGenerator();
             case BISHOP -> new BishopMoveGenerator();
-            case KNIGHT -> null;
-            case ROOK -> null;
+            case KNIGHT -> new KnightMoveGenerator();
+            case ROOK -> new RookMoveGenerator();
             case PAWN -> new PawnMoveGenerator();
         };
     }
