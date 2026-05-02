@@ -23,7 +23,7 @@ public abstract class MoveGenerator {
         if(at == null){
             return true;
         }
-        return at.getTeamColor() == self.getTeamColor();
+        return at.getTeamColor() != self.getTeamColor();
     }
 
 }
