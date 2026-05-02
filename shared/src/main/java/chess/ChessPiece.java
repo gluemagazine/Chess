@@ -1,9 +1,9 @@
 package chess;
 
-import chess.MoveGenerators.BishopMoveGenerator;
-import chess.MoveGenerators.MoveGenerator;
+import chess.MoveGenerators.*;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -26,7 +26,7 @@ public class ChessPiece {
             case BISHOP -> new BishopMoveGenerator();
             case KNIGHT -> null;
             case ROOK -> null;
-            case PAWN -> null;
+            case PAWN -> new PawnMoveGenerator();
         };
     }
 
@@ -65,5 +65,19 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         return generator.getMoves(board,myPosition,this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessPiece that = (ChessPiece) o;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 }
