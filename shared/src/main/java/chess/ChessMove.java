@@ -48,4 +48,16 @@ public class ChessMove {
     public String toString() {
         return String.format("%s,%s",startPosition,endPosition);
     }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        return startPosition.equals(((ChessMove) obj).startPosition) && endPosition.equals(((ChessMove) obj).endPosition);
+    }
 }
