@@ -1,5 +1,8 @@
 package chess;
 
+import chess.MoveGenerators.BishopMoveGenerator;
+import chess.MoveGenerators.MoveGenerator;
+
 import java.util.Collection;
 
 /**
@@ -12,10 +15,19 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
+    private final MoveGenerator generator;
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        generator = switch (this.type){
+            case KING -> null;
+            case QUEEN -> null;
+            case BISHOP -> new BishopMoveGenerator();
+            case KNIGHT -> null;
+            case ROOK -> null;
+            case PAWN -> null;
+        };
     }
 
     /**
@@ -52,6 +64,6 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        return generator.getMoves(board,myPosition,this);
     }
 }

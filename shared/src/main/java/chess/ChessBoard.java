@@ -13,6 +13,13 @@ public class ChessBoard {
         
     }
 
+    public boolean isValid(ChessPosition pos){
+        if (pos.getRow()-1 >= 8 || pos.getColumn()-1 >=8){
+            return false;
+        }
+        return pos.getRow()-1 >= 0 && pos.getColumn()-1 >= 0;
+    }
+
     /**
      * Adds a chess piece to the chessboard
      *
@@ -20,7 +27,9 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()][position.getColumn()] = piece;
+        if (isValid(position)){
+            squares[position.getRow()-1][position.getColumn()-1] = piece;
+        }
     }
 
     /**
@@ -31,7 +40,10 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()][position.getColumn()];
+        if(isValid(position)){
+            return squares[position.getRow()-1][position.getColumn()-1];
+        }
+        return null;
     }
 
     /**
