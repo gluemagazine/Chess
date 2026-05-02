@@ -36,4 +36,18 @@ public class ChessPosition {
     public String toString() {
         return String.format("[%d,%d]",row, col);
     }
+
+    @Override
+    public int hashCode() {
+        int hash = row;
+        hash = 31 * hash + col;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        return row == ((ChessPosition) obj).getRow() && col == ((ChessPosition) obj).getColumn();
+    }
 }
