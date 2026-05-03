@@ -51,13 +51,17 @@ public class ChessMove {
 
     @Override
     public int hashCode() {
-        return 31 * (startPosition.hashCode()) + endPosition.hashCode();
+        int hash = 31 * (startPosition.hashCode()) + endPosition.hashCode();
+        if(promotionPiece != null){
+            hash = hash * 31 + promotionPiece.hashCode();
+        }
+        return hash;
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        return startPosition.equals(((ChessMove) obj).startPosition) && endPosition.equals(((ChessMove) obj).endPosition);
+        return startPosition.equals(((ChessMove) obj).startPosition) && endPosition.equals(((ChessMove) obj).endPosition) && promotionPiece==((ChessMove) obj).promotionPiece;
     }
 }
