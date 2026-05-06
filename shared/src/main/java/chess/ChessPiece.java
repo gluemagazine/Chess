@@ -1,5 +1,7 @@
 package chess;
 
+import chess.MoveGenerators.*;
+
 import java.util.Collection;
 import java.util.Objects;
 
@@ -13,10 +15,19 @@ public class ChessPiece {
 
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
+    private final MoveGenerator generator;
 
     public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+        this.generator = switch (type){
+            case KING -> new KingMoveGenerator();
+            case QUEEN -> new QueenMoveGenerator();
+            case BISHOP -> new BishopMoveGenerator();
+            case KNIGHT -> new KnightMoveGenerator();
+            case ROOK -> new RookMoveGenerator();
+            case PAWN -> new PawnMoveGenerator();
+        };
     }
 
     /**
@@ -53,7 +64,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        return generator.generateMoves(board,myPosition);
     }
 
     @Override
