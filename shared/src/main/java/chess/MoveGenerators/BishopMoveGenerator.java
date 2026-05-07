@@ -1,35 +1,30 @@
 package chess.MoveGenerators;
 import chess.*;
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
-public class BishopMoveGenerator extends MoveGenerator {
-
+public class BishopMoveGenerator extends MoveGenerator{
     @Override
-    public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition myPosition, ChessPiece piece) {
-        ArrayList<ChessMove> valid_moves = new ArrayList<>();
-        int[][] slopes = {{1,1}, {-1,1}, {-1,-1}, {1,-1}};
-        for(int[] slope : slopes){
-            for(int i = 0; i < 8; i++) {
-                ChessPosition next = getDiagonal(myPosition,slope,i+1);
-                if(!board.isValid(next)){
-                    break;
-                }
-                ChessPiece at = board.getPiece(next);
-                if (at == null){
-                    valid_moves.add(new ChessMove(myPosition,next,null));
-                }
-                else if(at.getTeamColor() == piece.getTeamColor()){
-                    break;
+    public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition pos) {
+        ArrayList<ChessMove> valid_positions = new ArrayList<>();
+        ChessPiece piece = board.getPiece(pos);
+        int[][] dirs = {{-1,-1},{-1,1},{1,-1},{1,1}};
+        for(var dir: dirs){
+            for(int i = 1; i < 9; i ++){
+                ChessPosition new_pos = getPosFromVector(pos,dir,i);
+                if(validPosition(board,new_pos,piece)){
+                    ChessMove move = new ChessMove(pos,new_pos,null);
+                    valid_positions.add(move);
+                    if(board.getPiece(new_pos) != null){
+                        break;
+                    }
                 }
                 else{
-                    valid_moves.add(new ChessMove(myPosition,next,null));
                     break;
                 }
             }
         }
-
-        return valid_moves;
+        return valid_positions;
     }
 }

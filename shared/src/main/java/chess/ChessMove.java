@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Objects;
+
 /**
  * Represents moving a chess piece on a chessboard
  * <p>
@@ -7,7 +9,6 @@ package chess;
  * signature of the existing methods.
  */
 public class ChessMove {
-
 
     private final ChessPosition startPosition;
     private final ChessPosition endPosition;
@@ -45,23 +46,21 @@ public class ChessMove {
     }
 
     @Override
-    public String toString() {
-        return String.format("%s,%s",startPosition,endPosition);
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ChessMove chessMove = (ChessMove) o;
+        return Objects.equals(startPosition, chessMove.startPosition) && Objects.equals(endPosition, chessMove.endPosition) && promotionPiece == chessMove.promotionPiece;
     }
 
     @Override
     public int hashCode() {
-        int hash = 31 * (startPosition.hashCode()) + endPosition.hashCode();
-        if(promotionPiece != null){
-            hash = hash * 31 + promotionPiece.hashCode();
-        }
-        return hash;
+        return Objects.hash(startPosition, endPosition, promotionPiece);
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        return startPosition.equals(((ChessMove) obj).startPosition) && endPosition.equals(((ChessMove) obj).endPosition) && promotionPiece==((ChessMove) obj).promotionPiece;
+    public String toString() {
+        return String.format("%s,%s: %s",startPosition,endPosition,promotionPiece);
     }
 }

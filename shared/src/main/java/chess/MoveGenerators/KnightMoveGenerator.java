@@ -1,25 +1,23 @@
 package chess.MoveGenerators;
 
-import chess.ChessBoard;
-import chess.ChessMove;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class KnightMoveGenerator extends MoveGenerator{
     @Override
-    public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition myPosition, ChessPiece piece) {
-        ArrayList<ChessMove> valid_moves = new ArrayList<>();
-        int[][] slopes = {{1, 2}, {-1, 2}, {1, -2}, {-1, -2}, {-2, -1}, {2, -1},{2, 1}, {-2, 1}};
-        for (int[] slope : slopes) {
-            ChessPosition next = getDiagonal(myPosition, slope, 1);
-            if (getAndCheck(next,board,piece)){
-                valid_moves.add(new ChessMove(myPosition, next, null));
+    public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition pos) {
+        ArrayList<ChessMove> valid_positions = new ArrayList<>();
+        ChessPiece piece = board.getPiece(pos);
+        int[][] dirs = {{2,1},{2,-1},{-2,1},{-2,-1},{1,2},{1,-2},{-1,-2},{-1,2}};
+        for(var dir: dirs){
+            ChessPosition new_pos = getPosFromVector(pos,dir,1);
+            if(validPosition(board,new_pos,piece)){
+                ChessMove move = new ChessMove(pos,new_pos,null);
+                valid_positions.add(move);
             }
         }
-
-        return valid_moves;
+        return valid_positions;
     }
 }

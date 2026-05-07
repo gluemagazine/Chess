@@ -1,9 +1,8 @@
 package chess;
 
-import chess.MoveGenerators.*;
-
 import java.util.Collection;
 import java.util.Objects;
+import chess.MoveGenerators.*;
 
 /**
  * Represents a single chess piece
@@ -20,7 +19,7 @@ public class ChessPiece {
     public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
-        generator = switch (this.type){
+        this.generator = switch(type){
             case KING -> new KingMoveGenerator();
             case QUEEN -> new QueenMoveGenerator();
             case BISHOP -> new BishopMoveGenerator();
@@ -64,7 +63,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return generator.getMoves(board,myPosition,this);
+        return generator.getMoves(board,myPosition);
     }
 
     @Override
@@ -83,7 +82,7 @@ public class ChessPiece {
 
     @Override
     public String toString() {
-        String character = switch (this.type){
+        String character = switch(type){
             case KING -> "K";
             case QUEEN -> "Q";
             case BISHOP -> "B";
@@ -96,10 +95,4 @@ public class ChessPiece {
         }
         return character;
     }
-
-    //    public int hashCode() {
-//        int hash = pieceColor.hashCode();
-//        hash = hash * 31 + type.hashCode();
-//        return hash;
-//    }
 }
