@@ -6,6 +6,7 @@ import java.util.Collection;
 abstract
 public class MoveGenerator {
     abstract public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition pos);
+    abstract public Collection<ChessMove> getTheoreticalMoves(ChessBoard board, ChessPosition pos);
 
     public boolean validPosition(ChessBoard board, ChessPosition pos, ChessPiece piece){
         if(!board.isValid(pos)){
