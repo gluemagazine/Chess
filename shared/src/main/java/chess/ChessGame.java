@@ -94,13 +94,19 @@ public class ChessGame {
                 }
             }
         }
-
+        System.out.println("Result from the get threats function: ");
+        System.out.println(threats);
         return threats;
     }
 
     public boolean validMove(ChessBoard board,HashMap<ChessPosition,HashSet<ChessPosition>> theoretical, TeamColor player){
+        System.out.println("Started validating move");
+        System.out.println(board);
         HashSet<ChessPosition> threateningPieces;
         ChessPosition mustProtect;
+
+
+
         if(player == TeamColor.BLACK){
             mustProtect = blackKing;
         }
@@ -129,12 +135,19 @@ public class ChessGame {
     }
 
     public ChessBoard makeBoardFromMove(ChessMove move){
-        ChessBoard copy = new ChessBoard();
-        try{
-            copy = board.clone();
-        } catch (CloneNotSupportedException _) {
+        System.out.println("Original");
+        System.out.println(board);
+        System.out.println("Move: " + move);
 
+        ChessBoard copy = new ChessBoard();
+        for (int i = 0; i < 8; i++){
+            for(int j = 0; j < 9; j++){
+                copy.addPiece(new ChessPosition(i+1,j+1),board.getPiece(new ChessPosition(i+1,j+1)));
+            }
         }
+
+        System.out.println("Now, Original");
+        System.out.println(board);
 
         ChessPiece piece = copy.getPiece(move.getStartPosition());
         if(piece == null){
@@ -148,6 +161,10 @@ public class ChessGame {
             copy.setPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(),move.getPromotionPiece()));
             copy.setPiece(move.getStartPosition(),null);
         }
+        System.out.println("Now, again, Original");
+        System.out.println(board);
+        System.out.println("Copy");
+        System.out.println(board);
         return copy;
     }
 
@@ -168,12 +185,21 @@ public class ChessGame {
         }
         Collection<ChessMove> possible = piece.pieceMoves(board,startPosition);
         Collection<ChessMove> actual = new ArrayList<>();
+        System.out.println("obtained possible");
+//        System.out.println(board);
 
-        TeamColor opponent = piece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+        TeamColor opponent = piece.getTeamColor() == TeamColor.WHITE ? TeamColor.WHITE : TeamColor.BLACK;
 
         HashMap<ChessPosition,HashSet<ChessPosition>> theoretical = getThreatened(board,opponent,true);
 
+        System.out.println("obtained threatened");
+        System.out.println(board);
+
+        System.out.println(theoretical);
+        System.out.println(possible);
+
         for(var move : possible){
+
             boolean isValid = validMove(makeBoardFromMove(move),theoretical,turn);
             if(isValid){
                 actual.add(move);
@@ -191,9 +217,10 @@ public class ChessGame {
     public void makeMove(ChessMove move) throws InvalidMoveException {
         System.out.println(board);
         ChessBoard prev = new ChessBoard();
-        try{
-            prev = board.clone();
-        } catch (CloneNotSupportedException _) {
+        for (int i = 0; i < 8; i++){
+            for(int j = 0; j < 9; j++){
+                prev.addPiece(new ChessPosition(i+1,j+1),board.getPiece(new ChessPosition(i+1,j+1)));
+            }
         }
         ChessPosition start = move.getStartPosition();
         ChessPiece piece = board.getPiece(start);
@@ -330,10 +357,10 @@ public class ChessGame {
         blackPieces.clear();
         whitePieces.clear();
         ChessBoard copy = new ChessBoard();
-        try {
-            copy = board.clone();
-        } catch (CloneNotSupportedException _) {
-
+        for (int i = 0; i < 8; i++){
+            for(int j = 0; j < 9; j++){
+                copy.addPiece(new ChessPosition(i+1,j+1),board.getPiece(new ChessPosition(i+1,j+1)));
+            }
         }
         for (int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
