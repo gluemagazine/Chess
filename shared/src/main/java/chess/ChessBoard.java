@@ -36,6 +36,18 @@ public class ChessBoard {
     }
 
     /**
+     * Overrides a chess position on the chessboard
+     *
+     * @param position where to add the piece to
+     * @param piece    the piece to add
+     */
+    public void setPiece(ChessPosition position, ChessPiece piece) {
+        if (isValid(position)){
+            squares[position.getRow()-1][position.getColumn()-1] = piece;
+        }
+    }
+
+    /**
      * Gets a chess piece on the chessboard
      *
      * @param position The position to get the piece from
@@ -53,28 +65,36 @@ public class ChessBoard {
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
      */
+    private ChessPiece generatePiece(ChessGame.TeamColor color,ChessPiece.PieceType type){
+        return new ChessPiece(color, type);
+    }
+
     public void resetBoard() {
+        ChessGame.TeamColor white = ChessGame.TeamColor.WHITE;
+        ChessGame.TeamColor black = ChessGame.TeamColor.BLACK;
+
         for (int i = 0; i < 8; i++){
-            squares[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
-            squares[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+
+            squares[1][i] = generatePiece(white, ChessPiece.PieceType.PAWN);
+            squares[6][i] = generatePiece(black, ChessPiece.PieceType.PAWN);
         }
 
-        squares[0][0] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
-        squares[0][7] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
-        squares[7][0] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
-        squares[7][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
-        squares[0][1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
-        squares[0][6] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
-        squares[7][1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
-        squares[7][6] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
-        squares[0][2] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
-        squares[0][5] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
-        squares[7][2] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
-        squares[7][5] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
-        squares[0][3] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
-        squares[0][4] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
-        squares[7][3] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
-        squares[7][4] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
+        squares[0][0] = generatePiece(white, ChessPiece.PieceType.ROOK);
+        squares[0][7] = generatePiece(white, ChessPiece.PieceType.ROOK);
+        squares[7][0] = generatePiece(black, ChessPiece.PieceType.ROOK);
+        squares[7][7] = generatePiece(black, ChessPiece.PieceType.ROOK);
+        squares[0][1] = generatePiece(white, ChessPiece.PieceType.KNIGHT);
+        squares[0][6] = generatePiece(white, ChessPiece.PieceType.KNIGHT);
+        squares[7][1] = generatePiece(black, ChessPiece.PieceType.KNIGHT);
+        squares[7][6] = generatePiece(black, ChessPiece.PieceType.KNIGHT);
+        squares[0][2] = generatePiece(white, ChessPiece.PieceType.BISHOP);
+        squares[0][5] = generatePiece(white, ChessPiece.PieceType.BISHOP);
+        squares[7][2] = generatePiece(black, ChessPiece.PieceType.BISHOP);
+        squares[7][5] = generatePiece(black, ChessPiece.PieceType.BISHOP);
+        squares[0][3] = generatePiece(white, ChessPiece.PieceType.QUEEN);
+        squares[0][4] = generatePiece(white, ChessPiece.PieceType.KING);
+        squares[7][3] = generatePiece(black, ChessPiece.PieceType.QUEEN);
+        squares[7][4] = generatePiece(black, ChessPiece.PieceType.KING);
     }
 
     @Override
@@ -107,5 +127,12 @@ public class ChessBoard {
             thing.append("\n");
         }
         return thing.toString();
+    }
+
+    @Override
+    protected ChessBoard clone(){
+        ChessBoard copy = new ChessBoard();
+        copy.squares = squares.clone();
+        return copy;
     }
 }

@@ -66,6 +66,12 @@ public class ChessPiece {
         return generator.getMoves(board,myPosition);
     }
 
+    public Collection<ChessMove> theoreticalMoves(ChessBoard board, ChessPosition myPosition) {
+        return generator.getTheoreticalMoves(board,myPosition);
+    }
+
+
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) {

@@ -1,8 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A class that can manage a chess game, making moves on a board
@@ -14,11 +12,20 @@ public class ChessGame {
 
     private ChessBoard board;
     private TeamColor turn;
+    private HashSet<ChessPosition> blackPieces;
+    private HashSet<ChessPosition> whitePieces;
+    private ChessPosition whiteKing;
+    private ChessPosition blackKing;
+
+
 
     public ChessGame() {
-        board = new ChessBoard();
-        board.resetBoard();
         turn = TeamColor.WHITE;
+        blackPieces = new HashSet<>();
+        whitePieces = new HashSet<>();
+        ChessBoard newBoard = new ChessBoard();
+        newBoard.resetBoard();
+        setBoard(newBoard);
     }
 
     /**
@@ -44,7 +51,9 @@ public class ChessGame {
         WHITE,
         BLACK
     }
-
+    public Collection<ChessMove> getThreatened(ChessPosition startPosition, TeamColor opponent){
+        return null;
+    }
     /**
      * Gets all valid moves for a piece at the given location
      *
@@ -80,6 +89,11 @@ public class ChessGame {
         ChessPosition start = move.getStartPosition();
         ChessPiece piece = board.getPiece(start);
         Collection<ChessMove> valid = validMoves(start);
+
+        if (piece.getTeamColor() != turn){
+            throw new InvalidMoveException(String.format("It is not %s's turn",turn));
+        }
+
         boolean isValid = false;
         for(var thing : valid){
             if (thing.equals(move)){
@@ -92,6 +106,7 @@ public class ChessGame {
         }
         board.setPiece(move.getEndPosition(),piece);
         board.setPiece(move.getStartPosition(),null);
+
         if(isInCheck(turn)){
             board = prev;
             throw new InvalidMoveException(String.format("%s is not a valid move",move));
@@ -99,13 +114,24 @@ public class ChessGame {
 
         if(turn == TeamColor.WHITE){
             setTeamTurn(TeamColor.BLACK);
+            whitePieces.remove(move.getStartPosition());
+            whitePieces.add(move.getEndPosition());
+            blackPieces.remove(move.getEndPosition());
+            if(piece.getPieceType() == ChessPiece.PieceType.KING){
+                whiteKing = move.getEndPosition();
+            }
         }
         else{
             setTeamTurn(TeamColor.WHITE);
+            blackPieces.remove(move.getStartPosition());
+            blackPieces.add(move.getEndPosition());
+            whitePieces.remove(move.getEndPosition());
+            if(piece.getPieceType() == ChessPiece.PieceType.KING){
+                blackKing = move.getEndPosition();
+            }
         }
 
 
-//        throw new RuntimeException("Not implemented");
     }
 
     /**
@@ -152,6 +178,29 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
+
+        blackPieces.clear();
+        whitePieces.clear();
+        for (int i = 0; i < 8; i++){
+            for(int j = 0; j < 8; j++){
+                ChessPiece at = board.getPiece(new ChessPosition(i,j));
+                if (at == null){
+                    continue;
+                }
+                if (at.getTeamColor() == TeamColor.WHITE){
+                    whitePieces.add(new ChessPosition(i,j));
+                    if(at.getPieceType() == ChessPiece.PieceType.KING){
+                        whiteKing = new ChessPosition(i,j);
+                    }
+                }
+                else{
+                    blackPieces.add(new ChessPosition(i,j));
+                    if(at.getPieceType() == ChessPiece.PieceType.KING){
+                        blackKing = new ChessPosition(i,j);
+                    }
+                }
+            }
+        }
     }
 
     /**
