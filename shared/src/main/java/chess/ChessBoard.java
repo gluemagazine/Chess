@@ -115,8 +115,8 @@ public class ChessBoard {
     public String toString() {
         StringBuilder thing = new StringBuilder();
         thing.append("Board: \n");
-        for(ChessPiece[] row : squares){
-            for(ChessPiece piece : row){
+        for(int i = 8; i > 0; i--){
+            for(ChessPiece piece : squares[i-1]){
                 if (piece == null){
                     thing.append("| ");
                 }
