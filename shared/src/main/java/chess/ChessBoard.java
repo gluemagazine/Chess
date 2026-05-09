@@ -118,13 +118,13 @@ public class ChessBoard {
         for(ChessPiece[] row : squares){
             for(ChessPiece piece : row){
                 if (piece == null){
-                    thing.append("_");
+                    thing.append("| ");
                 }
                 else{
-                    thing.append(piece);
+                    thing.append(String.format("|%s",piece));
                 }
             }
-            thing.append("\n");
+            thing.append("|\n");
         }
         return thing.toString();
     }
