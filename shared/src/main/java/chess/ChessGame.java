@@ -53,6 +53,58 @@ public class ChessGame {
         BLACK
     }
 
+    public HashSet<ChessPosition> getWhiteThreats(ChessBoard board,boolean getTheoretical){
+        updatePieces(board);
+        HashMap<ChessPosition,HashSet<ChessPosition>> threats = new HashMap<>();
+        for (ChessPosition pos : whitePieces){
+            ChessPiece piece = board.getPiece(pos);
+
+            var threatened = piece.pieceMoves(board,pos);
+            if(getTheoretical){
+                threatened = piece.theoreticalMoves(board,pos);
+            }
+            for(var threat : threatened){
+                if(threats.containsKey(threat.getEndPosition())){
+                    threats.get(threat.getEndPosition()).add(pos);
+                }
+                else{
+                    threats.put(threat.getEndPosition(),new HashSet<>());
+                    threats.get(threat.getEndPosition()).add(pos);
+                }
+            }
+        }
+        if(threats.containsKey(blackKing)){
+            return threats.get(blackKing);
+        }
+        return null;
+    }
+
+    public HashSet<ChessPosition> getBlackThreats(ChessBoard board,boolean getTheoretical){
+        updatePieces(board);
+        HashMap<ChessPosition,HashSet<ChessPosition>> threats = new HashMap<>();
+        for (ChessPosition pos : blackPieces){
+            ChessPiece piece = board.getPiece(pos);
+
+            var threatened = piece.pieceMoves(board,pos);
+            if(getTheoretical){
+                threatened = piece.theoreticalMoves(board,pos);
+            }
+            for(var threat : threatened){
+                if(threats.containsKey(threat.getEndPosition())){
+                    threats.get(threat.getEndPosition()).add(pos);
+                }
+                else{
+                    threats.put(threat.getEndPosition(),new HashSet<>());
+                    threats.get(threat.getEndPosition()).add(pos);
+                }
+            }
+        }
+        if(threats.containsKey(whiteKing)){
+            return threats.get(whiteKing);
+        }
+        return null;
+    }
+
     public HashMap<ChessPosition,HashSet<ChessPosition>> getThreatened(ChessBoard board, TeamColor opponent, boolean getTheoretical){
         updatePieces(board);
 
@@ -99,27 +151,23 @@ public class ChessGame {
         return threats;
     }
 
-    public boolean validMove(ChessBoard board,HashMap<ChessPosition,HashSet<ChessPosition>> theoretical, TeamColor player){
-        System.out.println("Started validating move");
-        System.out.println(board);
-        HashSet<ChessPosition> threateningPieces;
-        ChessPosition mustProtect;
-
-
-
+    public boolean validMove(ChessBoard board,HashMap<ChessPosition,HashSet<ChessPosition>> theoretical, TeamColor player,ChessPosition mustProtect){
+        HashSet<ChessPosition> allEnemyPieces;
         if(player == TeamColor.BLACK){
-            mustProtect = blackKing;
+            allEnemyPieces = whitePieces;
         }
         else {
-            mustProtect = whiteKing;
+            allEnemyPieces = blackPieces;
         }
         if(!theoretical.containsKey(mustProtect)){
             return true;
         }
         HashMap<ChessPosition,HashSet<ChessPosition>> newThreats = new HashMap<>();
-        threateningPieces = theoretical.get(mustProtect);
-        for (var pos : threateningPieces){
+        for (var pos : allEnemyPieces){
             ChessPiece piece = board.getPiece(pos);
+            if (piece == null){
+                continue;
+            }
             var threatened = piece.pieceMoves(board,pos);
             for(var threat : threatened){
                 if(newThreats.containsKey(threat.getEndPosition())){
@@ -131,13 +179,11 @@ public class ChessGame {
                 }
             }
         }
+        System.out.println(newThreats);
         return !(newThreats.containsKey(mustProtect));
     }
 
     public ChessBoard makeBoardFromMove(ChessMove move){
-        System.out.println("Original");
-        System.out.println(board);
-        System.out.println("Move: " + move);
 
         ChessBoard copy = new ChessBoard();
         for (int i = 0; i < 8; i++){
@@ -146,8 +192,6 @@ public class ChessGame {
             }
         }
 
-        System.out.println("Now, Original");
-        System.out.println(board);
 
         ChessPiece piece = copy.getPiece(move.getStartPosition());
         if(piece == null){
@@ -161,10 +205,6 @@ public class ChessGame {
             copy.setPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(),move.getPromotionPiece()));
             copy.setPiece(move.getStartPosition(),null);
         }
-        System.out.println("Now, again, Original");
-        System.out.println(board);
-        System.out.println("Copy");
-        System.out.println(board);
         return copy;
     }
 
@@ -188,20 +228,34 @@ public class ChessGame {
         System.out.println("obtained possible");
 //        System.out.println(board);
 
-        TeamColor opponent = piece.getTeamColor() == TeamColor.WHITE ? TeamColor.WHITE : TeamColor.BLACK;
+        TeamColor opponent = (piece.getTeamColor() == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 
         HashMap<ChessPosition,HashSet<ChessPosition>> theoretical = getThreatened(board,opponent,true);
+        HashMap<ChessPosition,HashSet<ChessPosition>> actualThreats = getThreatened(board,opponent,false);
+
 
         System.out.println("obtained threatened");
-        System.out.println(board);
+//        System.out.println(board);
+//
+//        System.out.println(theoretical);
+//        System.out.println(possible);
 
-        System.out.println(theoretical);
-        System.out.println(possible);
+//        System.out.println("Theoretical white captures" + getBlackThreats(board,true));
+//        System.out.println("Theoretical black captures" + getWhiteThreats(board,true));
 
         for(var move : possible){
-
-            boolean isValid = validMove(makeBoardFromMove(move),theoretical,turn);
+            boolean isValid;
+            if(piece.getPieceType() == ChessPiece.PieceType.KING){
+                isValid = validMove(makeBoardFromMove(move),theoretical,turn,move.getEndPosition());
+            }else {
+                isValid = validMove(makeBoardFromMove(move),theoretical,turn,(piece.getTeamColor() == TeamColor.WHITE) ? whiteKing: blackKing);
+            }
             if(isValid){
+                if (startPosition == ((piece.getTeamColor() == TeamColor.WHITE) ? whiteKing: blackKing)){
+                    if (actualThreats.containsKey(move.getEndPosition())){
+                        continue;
+                    }
+                }
                 actual.add(move);
             }
         }
@@ -230,10 +284,6 @@ public class ChessGame {
         if (!prev.equals(board)){
             System.out.println("There was a problem");
         }
-//        System.out.println("After valid obtained: ");
-//        System.out.println("Move: " + move);
-//        System.out.println(board);
-//        System.out.println("Prev " + prev);
 
 
         if(piece == null){
@@ -280,12 +330,22 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        HashMap<ChessPosition,HashSet<ChessPosition>> actual = getThreatened(board,(turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE,false);
+        var enemies = (teamColor == TeamColor.WHITE) ? blackPieces : whitePieces;
+
+        HashSet<ChessPosition> actual = new HashSet<>();
+
+        for(var enemy : enemies){
+            var threatened = board.getPiece(enemy).pieceMoves(board,enemy);
+            for (var threat : threatened){
+                actual.add(threat.getEndPosition());
+            }
+        }
+
         if(teamColor == TeamColor.BLACK){
-            return actual.containsKey(blackKing);
+            return actual.contains(blackKing);
         }
         else {
-            return actual.containsKey(whiteKing);
+            return actual.contains(whiteKing);
         }
     }
 
