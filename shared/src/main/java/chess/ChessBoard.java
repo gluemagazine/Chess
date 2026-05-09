@@ -130,7 +130,8 @@ public class ChessBoard {
     }
 
     @Override
-    protected ChessBoard clone(){
+    public ChessBoard clone() throws CloneNotSupportedException {
+//        ChessBoard chessBoard = (ChessBoard) super.clone();
         ChessBoard copy = new ChessBoard();
         copy.squares = squares.clone();
         return copy;

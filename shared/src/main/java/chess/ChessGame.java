@@ -129,7 +129,13 @@ public class ChessGame {
     }
 
     public ChessBoard makeBoardFromMove(ChessMove move){
-        ChessBoard copy = board.clone();
+        ChessBoard copy = new ChessBoard();
+        try{
+            copy = board.clone();
+        } catch (CloneNotSupportedException _) {
+
+        }
+
         ChessPiece piece = copy.getPiece(move.getStartPosition());
         if(piece == null){
             return copy;
@@ -142,7 +148,7 @@ public class ChessGame {
             copy.setPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(),move.getPromotionPiece()));
             copy.setPiece(move.getStartPosition(),null);
         }
-        return null;
+        return copy;
     }
 
     /**
@@ -154,7 +160,8 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         updatePieces(board);
-
+        System.out.println("Starting to get moves");
+        System.out.println(board);
         ChessPiece piece = board.getPiece(startPosition);
         if(piece == null){
             return null;
@@ -162,7 +169,7 @@ public class ChessGame {
         Collection<ChessMove> possible = piece.pieceMoves(board,startPosition);
         Collection<ChessMove> actual = new ArrayList<>();
 
-        TeamColor opponent = turn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
+        TeamColor opponent = piece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE;
 
         HashMap<ChessPosition,HashSet<ChessPosition>> theoretical = getThreatened(board,opponent,true);
 
@@ -172,8 +179,6 @@ public class ChessGame {
                 actual.add(move);
             }
         }
-
-
         return actual;
     }
 
@@ -184,10 +189,29 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessBoard prev = board.clone();
+        System.out.println(board);
+        ChessBoard prev = new ChessBoard();
+        try{
+            prev = board.clone();
+        } catch (CloneNotSupportedException _) {
+        }
         ChessPosition start = move.getStartPosition();
         ChessPiece piece = board.getPiece(start);
+        System.out.println("Prev " + prev);
+
         Collection<ChessMove> valid = validMoves(start);
+        if (!prev.equals(board)){
+            System.out.println("There was a problem");
+        }
+//        System.out.println("After valid obtained: ");
+//        System.out.println("Move: " + move);
+//        System.out.println(board);
+//        System.out.println("Prev " + prev);
+
+
+        if(piece == null){
+            throw new InvalidMoveException(String.format("There is no piece at %s",start));
+        }
 
         if (piece.getTeamColor() != turn){
             throw new InvalidMoveException(String.format("It is not %s's turn",turn));
@@ -206,6 +230,8 @@ public class ChessGame {
         if (move.getPromotionPiece() == null){
             board.setPiece(move.getEndPosition(),piece);
             board.setPiece(move.getStartPosition(),null);
+//            System.out.println("It should have cleared the start position : " + move.getStartPosition());
+//            System.out.println("Currently is: " + board.getPiece(move.getStartPosition()));
         }
         else {
             board.setPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(),move.getPromotionPiece()));
@@ -216,27 +242,8 @@ public class ChessGame {
             board = prev;
             throw new InvalidMoveException(String.format("%s is not a valid move",move));
         }
-
-        if(turn == TeamColor.WHITE){
-            setTeamTurn(TeamColor.BLACK);
-            whitePieces.remove(move.getStartPosition());
-            whitePieces.add(move.getEndPosition());
-            blackPieces.remove(move.getEndPosition());
-            if(piece.getPieceType() == ChessPiece.PieceType.KING){
-                whiteKing = move.getEndPosition();
-            }
-        }
-        else{
-            setTeamTurn(TeamColor.WHITE);
-            blackPieces.remove(move.getStartPosition());
-            blackPieces.add(move.getEndPosition());
-            whitePieces.remove(move.getEndPosition());
-            if(piece.getPieceType() == ChessPiece.PieceType.KING){
-                blackKing = move.getEndPosition();
-            }
-        }
-
-
+        updatePieces(board);
+        setTeamTurn((turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE);
     }
 
     /**
@@ -246,7 +253,7 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        HashMap<ChessPosition,HashSet<ChessPosition>> actual = getThreatened(board,teamColor,false);
+        HashMap<ChessPosition,HashSet<ChessPosition>> actual = getThreatened(board,(turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE,false);
         if(teamColor == TeamColor.BLACK){
             return actual.containsKey(blackKing);
         }
@@ -262,7 +269,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        if(! isInCheck( teamColor)){
+        if(!isInCheck( teamColor)){
             return false;
         }
         if( teamColor == TeamColor.BLACK){
@@ -294,6 +301,10 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        if (isInCheck(teamColor)){
+            return false;
+        }
+
         if( teamColor == TeamColor.BLACK){
             for(var pos : blackPieces){
                 Collection<ChessMove> possible = validMoves(pos);
@@ -318,6 +329,12 @@ public class ChessGame {
     public void updatePieces(ChessBoard board){
         blackPieces.clear();
         whitePieces.clear();
+        ChessBoard copy = new ChessBoard();
+        try {
+            copy = board.clone();
+        } catch (CloneNotSupportedException _) {
+
+        }
         for (int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
                 ChessPiece at = board.getPiece(new ChessPosition(i+1,j+1));
@@ -338,8 +355,11 @@ public class ChessGame {
                 }
             }
         }
-        System.out.println(whitePieces);
-        System.out.println(blackPieces);
+        if (!copy.equals(board)){
+            System.out.println("There was a problem");
+        }
+//        System.out.println(whitePieces);
+//        System.out.println(blackPieces);
     }
 
     /**
@@ -348,7 +368,9 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
+//        System.out.println("Provided board: " + board);
         this.board = board;
+//        System.out.println("New board" + this.board);
         updatePieces(board);
     }
 
