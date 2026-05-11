@@ -111,11 +111,6 @@ public class PawnMoveGenerator extends MoveGenerator{
         for(var dir : validAttacks){
             ChessPosition new_pos = getPosFromVector(pos,dir,1);
             if(board.isValid(new_pos)){
-                if (board.getPiece(new_pos) != null){
-                    if(board.getPiece(new_pos).getTeamColor() == piece.getTeamColor()){
-                        continue;
-                    }
-                }
                 ChessMove move = new ChessMove(pos,new_pos,null);
                 valid_positions.add(move);
             }
