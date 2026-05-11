@@ -13,8 +13,8 @@ public class ChessGame {
 
     private ChessBoard board;
     private TeamColor turn;
-    private HashSet<ChessPosition> blackPieces;
-    private HashSet<ChessPosition> whitePieces;
+    final private HashSet<ChessPosition> blackPieces;
+    final private HashSet<ChessPosition> whitePieces;
     private ChessPosition whiteKing;
     private ChessPosition blackKing;
 
@@ -51,58 +51,6 @@ public class ChessGame {
     public enum TeamColor {
         WHITE,
         BLACK
-    }
-
-    public HashSet<ChessPosition> getWhiteThreats(ChessBoard board,boolean getTheoretical){
-        updatePieces(board);
-        HashMap<ChessPosition,HashSet<ChessPosition>> threats = new HashMap<>();
-        for (ChessPosition pos : whitePieces){
-            ChessPiece piece = board.getPiece(pos);
-
-            var threatened = piece.pieceMoves(board,pos);
-            if(getTheoretical){
-                threatened = piece.theoreticalMoves(board,pos);
-            }
-            for(var threat : threatened){
-                if(threats.containsKey(threat.getEndPosition())){
-                    threats.get(threat.getEndPosition()).add(pos);
-                }
-                else{
-                    threats.put(threat.getEndPosition(),new HashSet<>());
-                    threats.get(threat.getEndPosition()).add(pos);
-                }
-            }
-        }
-        if(threats.containsKey(blackKing)){
-            return threats.get(blackKing);
-        }
-        return null;
-    }
-
-    public HashSet<ChessPosition> getBlackThreats(ChessBoard board,boolean getTheoretical){
-        updatePieces(board);
-        HashMap<ChessPosition,HashSet<ChessPosition>> threats = new HashMap<>();
-        for (ChessPosition pos : blackPieces){
-            ChessPiece piece = board.getPiece(pos);
-
-            var threatened = piece.pieceMoves(board,pos);
-            if(getTheoretical){
-                threatened = piece.theoreticalMoves(board,pos);
-            }
-            for(var threat : threatened){
-                if(threats.containsKey(threat.getEndPosition())){
-                    threats.get(threat.getEndPosition()).add(pos);
-                }
-                else{
-                    threats.put(threat.getEndPosition(),new HashSet<>());
-                    threats.get(threat.getEndPosition()).add(pos);
-                }
-            }
-        }
-        if(threats.containsKey(whiteKing)){
-            return threats.get(whiteKing);
-        }
-        return null;
     }
 
     public HashMap<ChessPosition,HashSet<ChessPosition>> getThreatened(ChessBoard board, TeamColor opponent, boolean getTheoretical){
@@ -146,8 +94,6 @@ public class ChessGame {
                 }
             }
         }
-        System.out.println("Result from the get threats function: ");
-        System.out.println(threats);
         return threats;
     }
 
@@ -165,9 +111,7 @@ public class ChessGame {
         HashMap<ChessPosition,HashSet<ChessPosition>> newThreats = new HashMap<>();
         for (var pos : allEnemyPieces){
             ChessPiece piece = board.getPiece(pos);
-            if (piece == null){
-                continue;
-            }
+
             var threatened = piece.pieceMoves(board,pos);
             for(var threat : threatened){
                 if(newThreats.containsKey(threat.getEndPosition())){
@@ -179,7 +123,6 @@ public class ChessGame {
                 }
             }
         }
-        System.out.println(newThreats);
         return !(newThreats.containsKey(mustProtect));
     }
 
@@ -225,8 +168,7 @@ public class ChessGame {
         }
         Collection<ChessMove> possible = piece.pieceMoves(board,startPosition);
         Collection<ChessMove> actual = new ArrayList<>();
-        System.out.println("obtained possible");
-//        System.out.println(board);
+
 
         TeamColor opponent = (piece.getTeamColor() == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
 
@@ -234,21 +176,13 @@ public class ChessGame {
         HashMap<ChessPosition,HashSet<ChessPosition>> actualThreats = getThreatened(board,opponent,false);
 
 
-        System.out.println("obtained threatened");
-//        System.out.println(board);
-//
-//        System.out.println(theoretical);
-//        System.out.println(possible);
-
-//        System.out.println("Theoretical white captures" + getBlackThreats(board,true));
-//        System.out.println("Theoretical black captures" + getWhiteThreats(board,true));
 
         for(var move : possible){
             boolean isValid;
             if(piece.getPieceType() == ChessPiece.PieceType.KING){
-                isValid = validMove(makeBoardFromMove(move),theoretical,turn,move.getEndPosition());
+                isValid = validMove(makeBoardFromMove(move),theoretical,piece.getTeamColor(),move.getEndPosition());
             }else {
-                isValid = validMove(makeBoardFromMove(move),theoretical,turn,(piece.getTeamColor() == TeamColor.WHITE) ? whiteKing: blackKing);
+                isValid = validMove(makeBoardFromMove(move),theoretical,piece.getTeamColor(),(piece.getTeamColor() == TeamColor.WHITE) ? whiteKing: blackKing);
             }
             if(isValid){
                 if (startPosition == ((piece.getTeamColor() == TeamColor.WHITE) ? whiteKing: blackKing)){
@@ -269,7 +203,6 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        System.out.println(board);
         ChessBoard prev = new ChessBoard();
         for (int i = 0; i < 8; i++){
             for(int j = 0; j < 9; j++){
@@ -278,12 +211,8 @@ public class ChessGame {
         }
         ChessPosition start = move.getStartPosition();
         ChessPiece piece = board.getPiece(start);
-        System.out.println("Prev " + prev);
 
         Collection<ChessMove> valid = validMoves(start);
-        if (!prev.equals(board)){
-            System.out.println("There was a problem");
-        }
 
 
         if(piece == null){
@@ -307,8 +236,6 @@ public class ChessGame {
         if (move.getPromotionPiece() == null){
             board.setPiece(move.getEndPosition(),piece);
             board.setPiece(move.getStartPosition(),null);
-//            System.out.println("It should have cleared the start position : " + move.getStartPosition());
-//            System.out.println("Currently is: " + board.getPiece(move.getStartPosition()));
         }
         else {
             board.setPiece(move.getEndPosition(), new ChessPiece(piece.getTeamColor(),move.getPromotionPiece()));
@@ -330,7 +257,8 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        var enemies = (teamColor == TeamColor.WHITE) ? blackPieces : whitePieces;
+        var temp = (teamColor == TeamColor.WHITE) ? blackPieces : whitePieces;
+        var enemies = new HashSet<>(temp);
 
         HashSet<ChessPosition> actual = new HashSet<>();
 
@@ -359,8 +287,10 @@ public class ChessGame {
         if(!isInCheck( teamColor)){
             return false;
         }
+        var temp =(teamColor == TeamColor.WHITE) ? whitePieces : blackPieces;
+        var pieces = new HashSet<>(temp);
         if( teamColor == TeamColor.BLACK){
-            for(var pos : blackPieces){
+            for(var pos : pieces){
                 Collection<ChessMove> possible = validMoves(pos);
                 if(possible.isEmpty()){
                     continue;
@@ -369,7 +299,7 @@ public class ChessGame {
             }
         }
         else{
-            for(var pos : whitePieces){
+            for(var pos : pieces){
                 Collection<ChessMove> possible = validMoves(pos);
                 if(possible.isEmpty()){
                     continue;
@@ -445,8 +375,6 @@ public class ChessGame {
         if (!copy.equals(board)){
             System.out.println("There was a problem");
         }
-//        System.out.println(whitePieces);
-//        System.out.println(blackPieces);
     }
 
     /**
@@ -455,9 +383,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-//        System.out.println("Provided board: " + board);
         this.board = board;
-//        System.out.println("New board" + this.board);
         updatePieces(board);
     }
 
