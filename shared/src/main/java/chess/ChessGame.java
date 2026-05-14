@@ -17,7 +17,8 @@ public class ChessGame {
     final private HashSet<ChessPosition> whitePieces;
     private ChessPosition whiteKing;
     private ChessPosition blackKing;
-
+    private HashSet<ChessPosition> blackCastles;
+    private HashSet<ChessPosition> whiteCastles;
 
 
     public ChessGame() {
@@ -27,6 +28,12 @@ public class ChessGame {
         ChessBoard newBoard = new ChessBoard();
         newBoard.resetBoard();
         setBoard(newBoard);
+        blackCastles = new HashSet<>();
+        blackCastles.add(new ChessPosition(8,1));
+        blackCastles.add(new ChessPosition(8,8));
+        whiteCastles = new HashSet<>();
+        whiteCastles.add(new ChessPosition(1,1));
+        whiteCastles.add(new ChessPosition(1,8));
     }
 
     /**
@@ -43,6 +50,15 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         turn = team;
+        if (team == TeamColor.BLACK){
+            System.out.println(board.getBlackEnPasant());
+            board.setWhiteEnPasant(new ChessPosition(-1,-1));
+        }
+        else {
+            System.out.println(board.getWhiteEnPasant());
+
+            board.setBlackEnPasant(new ChessPosition(-1,-1));
+        }
     }
 
     /**
@@ -53,7 +69,20 @@ public class ChessGame {
         BLACK
     }
 
-    public HashMap<ChessPosition,HashSet<ChessPosition>> getThreatened(ChessBoard board, TeamColor opponent, boolean getTheoretical){
+    private HashMap<ChessPosition,HashSet<ChessPosition>> getCastles(){
+        return null;
+    }
+
+    private boolean canCastle(TeamColor whoTurn, ChessBoard board, HashMap<ChessPosition,HashSet<ChessPosition>> threatened){
+        HashSet<ChessPosition> possible = (whoTurn == TeamColor.WHITE) ? whiteCastles : blackCastles;
+        if (possible.isEmpty()){
+            return false;
+        }
+
+        return false;
+    }
+
+    private HashMap<ChessPosition,HashSet<ChessPosition>> getThreatened(ChessBoard board, TeamColor opponent, boolean getTheoretical){
         updatePieces(board);
 
         HashMap<ChessPosition,HashSet<ChessPosition>> threats = new HashMap<>();
@@ -97,7 +126,7 @@ public class ChessGame {
         return threats;
     }
 
-    public boolean validMove(ChessBoard board,HashMap<ChessPosition,HashSet<ChessPosition>> theoretical, TeamColor player,ChessPosition mustProtect){
+    private boolean validMove(ChessBoard board,HashMap<ChessPosition,HashSet<ChessPosition>> theoretical, TeamColor player,ChessPosition mustProtect){
         HashSet<ChessPosition> allEnemyPieces;
         if(player == TeamColor.BLACK){
             allEnemyPieces = whitePieces;
@@ -134,7 +163,8 @@ public class ChessGame {
                 copy.addPiece(new ChessPosition(i+1,j+1),board.getPiece(new ChessPosition(i+1,j+1)));
             }
         }
-
+        copy.setBlackEnPasant(board.getBlackEnPasant());
+        copy.setWhiteEnPasant(board.getWhiteEnPasant());
 
         ChessPiece piece = copy.getPiece(move.getStartPosition());
         if(piece == null){
@@ -209,6 +239,9 @@ public class ChessGame {
                 prev.addPiece(new ChessPosition(i+1,j+1),board.getPiece(new ChessPosition(i+1,j+1)));
             }
         }
+        prev.setBlackEnPasant(board.getBlackEnPasant());
+        prev.setWhiteEnPasant(board.getWhiteEnPasant());
+
         ChessPosition start = move.getStartPosition();
         ChessPiece piece = board.getPiece(start);
 
@@ -247,7 +280,30 @@ public class ChessGame {
             throw new InvalidMoveException(String.format("%s is not a valid move",move));
         }
         updatePieces(board);
+        if(piece.getPieceType() == ChessPiece.PieceType.PAWN){
+            if(board.getBlackEnPasant().equals( move.getEndPosition())){
+                System.out.println("I did one?");
+                board.setPiece(new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn()), null);
+            }
+            else if (board.getWhiteEnPasant().equals( move.getEndPosition())){
+                board.setPiece(new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn()), null);
+            }
+
+            if(move.getStartPosition().getRow() - move.getEndPosition().getRow() < -1){
+                board.setBlackEnPasant(new ChessPosition(move.getStartPosition().getRow() + 1,move.getStartPosition().getColumn()));
+            }
+            else if(move.getStartPosition().getRow() - move.getEndPosition().getRow() > 1){
+                board.setWhiteEnPasant(new ChessPosition(move.getStartPosition().getRow() - 1,move.getStartPosition().getColumn()));
+            }
+        }
         setTeamTurn((turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE);
+
+        if (move.getStartPosition() == blackKing){
+            blackCastles.clear();
+        }
+        if (move.getStartPosition() == whiteKing){
+            whiteCastles.clear();
+        }
     }
 
     /**
@@ -343,7 +399,7 @@ public class ChessGame {
         return true;
     }
 
-    public void updatePieces(ChessBoard board){
+    private void updatePieces(ChessBoard board){
         blackPieces.clear();
         whitePieces.clear();
         ChessBoard copy = new ChessBoard();

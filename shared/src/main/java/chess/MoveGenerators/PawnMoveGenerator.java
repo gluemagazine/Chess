@@ -10,6 +10,8 @@ public class PawnMoveGenerator extends MoveGenerator{
     public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition pos) {
         ArrayList<ChessMove> valid_positions = new ArrayList<>();
         ChessPiece piece = board.getPiece(pos);
+        ChessPosition pesant = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? board.getWhiteEnPasant() : board.getBlackEnPasant();
+
         int[][] validAttacks;
         int[][] validMoves;
         boolean canDouble = false;
@@ -38,6 +40,10 @@ public class PawnMoveGenerator extends MoveGenerator{
             ChessPosition new_pos = getPosFromVector(pos,dir,1);
             if(validPosition(board,new_pos,piece)){
                 if(board.getPiece(new_pos) == null){
+                    if (pesant.equals(new_pos)){
+                        ChessMove move = new ChessMove(pos,new_pos,null);
+                        valid_positions.add(move);
+                    }
                     continue;
                 }
                 ChessMove move = new ChessMove(pos,new_pos,null);

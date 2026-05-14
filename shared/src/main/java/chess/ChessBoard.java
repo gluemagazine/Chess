@@ -12,8 +12,11 @@ import java.util.Objects;
 public class ChessBoard {
 
     ChessPiece[][] squares = new ChessPiece[8][8];
+    private ChessPosition blackEnPasant;
+    private ChessPosition whiteEnPasant;
     public ChessBoard() {
-        
+        blackEnPasant = new ChessPosition(-1,-1);
+        whiteEnPasant = new ChessPosition(-1,-1);
     }
 
     public boolean isValid(ChessPosition pos){
@@ -135,5 +138,24 @@ public class ChessBoard {
         ChessBoard copy = new ChessBoard();
         copy.squares = squares.clone();
         return copy;
+    }
+
+    public ChessPosition getBlackEnPasant() {
+        return blackEnPasant;
+    }
+
+    public void setBlackEnPasant(ChessPosition newPesants) {
+        blackEnPasant = newPesants;
+        System.out.println("black: " + newPesants);
+
+    }
+
+    public ChessPosition getWhiteEnPasant() {
+        return whiteEnPasant;
+    }
+
+    public void setWhiteEnPasant(ChessPosition newPesants) {
+        whiteEnPasant = newPesants;
+        System.out.println("white: " + newPesants);
     }
 }
