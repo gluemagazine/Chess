@@ -1,4 +1,4 @@
-package chess.MoveGenerators;
+package chess.movegenerators;
 import chess.*;
 
 import java.util.ArrayList;
@@ -10,15 +10,15 @@ public class MoveGenerator {
     abstract public Collection<ChessMove> getTheoreticalMoves(ChessBoard board, ChessPosition pos);
 
     public Collection<ChessMove> getMovesFromDirs(ChessBoard board, ChessPosition pos, int[][] dirs, int reach){
-        ArrayList<ChessMove> valid_positions = new ArrayList<>();
+        ArrayList<ChessMove> validPositions = new ArrayList<>();
         ChessPiece piece = board.getPiece(pos);
         for(var dir: dirs){
             for(int i = 1; i < reach + 1; i ++){
-                ChessPosition new_pos = getPosFromVector(pos,dir,i);
-                if(validPosition(board,new_pos,piece)){
-                    ChessMove move = new ChessMove(pos,new_pos,null);
-                    valid_positions.add(move);
-                    if(board.getPiece(new_pos) != null){
+                ChessPosition newPos = getPosFromVector(pos,dir,i);
+                if(validPosition(board,newPos,piece)){
+                    ChessMove move = new ChessMove(pos,newPos,null);
+                    validPositions.add(move);
+                    if(board.getPiece(newPos) != null){
                         break;
                     }
                 }
@@ -27,24 +27,24 @@ public class MoveGenerator {
                 }
             }
         }
-        return valid_positions;
+        return validPositions;
     }
 
     public Collection<ChessMove> getTheoreticalFromDirs(ChessBoard board, ChessPosition pos, int[][] dirs, int reach){
-        ArrayList<ChessMove> valid_positions = new ArrayList<>();
+        ArrayList<ChessMove> validPositions = new ArrayList<>();
         for(var dir: dirs){
             for(int i = 1; i < reach + 1; i ++){
-                ChessPosition new_pos = getPosFromVector(pos,dir,i);
-                if(board.isValid(new_pos)){
-                    ChessMove move = new ChessMove(pos,new_pos,null);
-                    valid_positions.add(move);
+                ChessPosition newPos = getPosFromVector(pos,dir,i);
+                if(board.isValid(newPos)){
+                    ChessMove move = new ChessMove(pos,newPos,null);
+                    validPositions.add(move);
                 }
                 else{
                     break;
                 }
             }
         }
-        return valid_positions;
+        return validPositions;
     }
 
     public boolean validPosition(ChessBoard board, ChessPosition pos, ChessPiece piece){

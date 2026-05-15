@@ -1,4 +1,4 @@
-package chess.MoveGenerators;
+package chess.movegenerators;
 
 import chess.*;
 
@@ -8,7 +8,7 @@ import java.util.Collection;
 public class PawnMoveGenerator extends MoveGenerator{
     @Override
     public Collection<ChessMove> getMoves(ChessBoard board, ChessPosition pos) {
-        ArrayList<ChessMove> valid_positions = new ArrayList<>();
+        ArrayList<ChessMove> validPositions = new ArrayList<>();
         ChessPiece piece = board.getPiece(pos);
         ChessPosition pesant = (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? board.getWhiteEnPasant() : board.getBlackEnPasant();
 
@@ -37,40 +37,46 @@ public class PawnMoveGenerator extends MoveGenerator{
         }
 
         for(var dir : validAttacks){
-            ChessPosition new_pos = getPosFromVector(pos,dir,1);
-            if(validPosition(board,new_pos,piece)){
-                if(board.getPiece(new_pos) == null){
-                    if (pesant.equals(new_pos)){
-                        ChessMove move = new ChessMove(pos,new_pos,null);
-                        valid_positions.add(move);
+            ChessPosition newPos = getPosFromVector(pos,dir,1);
+            if(validPosition(board,newPos,piece)){
+                if(board.getPiece(newPos) == null){
+                    if (pesant.equals(newPos)){
+                        ChessMove move = new ChessMove(pos,newPos,null);
+                        validPositions.add(move);
                     }
                     continue;
                 }
-                ChessMove move = new ChessMove(pos,new_pos,null);
-                valid_positions.add(move);
+                ChessMove move = new ChessMove(pos,newPos,null);
+                validPositions.add(move);
             }
         }
 
 
-        ChessPosition new_pos = getPosFromVector(pos,validMoves[0], 1);
-        if(validPosition(board,new_pos,piece)){
-            if(board.getPiece(new_pos) == null){
-                ChessMove move = new ChessMove(pos,new_pos,null);
-                valid_positions.add(move);
-                if(canDouble){
-                    new_pos = getPosFromVector(pos,validMoves[1], 1);
-                    if(board.getPiece(new_pos) == null){
-                        if(validPosition(board,new_pos,piece)) {
-                            move = new ChessMove(pos,new_pos,null);
-                            valid_positions.add(move);
-                        }
-                    }
+        ChessPosition newPos = getPosFromVector(pos,validMoves[0], 1);
+        for(int i = 0; i < 1; i++){
+            if(!validPosition(board,newPos,piece)){
+                break;
+            }
+            if(!(board.getPiece(newPos) == null)){
+                break;
+            }
+            ChessMove move = new ChessMove(pos,newPos,null);
+            validPositions.add(move);
+            if(!canDouble){
+                break;
+            }
+            newPos = getPosFromVector(pos,validMoves[1], 1);
+            if(board.getPiece(newPos) == null){
+                if(validPosition(board,newPos,piece)) {
+                    move = new ChessMove(pos,newPos,null);
+                    validPositions.add(move);
                 }
             }
         }
+
         ArrayList<ChessMove> promotedPositions = new ArrayList<>();
 
-        for (var move : valid_positions){
+        for (var move : validPositions){
             if(move.getEndPosition().getRow() == 1 || move.getEndPosition().getRow() == 8){
                 promotedPositions.add(new ChessMove(move.getStartPosition(),move.getEndPosition(), ChessPiece.PieceType.BISHOP));
                 promotedPositions.add(new ChessMove(move.getStartPosition(),move.getEndPosition(), ChessPiece.PieceType.ROOK));
@@ -88,7 +94,7 @@ public class PawnMoveGenerator extends MoveGenerator{
 
     @Override
     public Collection<ChessMove> getTheoreticalMoves(ChessBoard board, ChessPosition pos) {
-        ArrayList<ChessMove> valid_positions = new ArrayList<>();
+        ArrayList<ChessMove> validPositions = new ArrayList<>();
         ChessPiece piece = board.getPiece(pos);
         int[][] validAttacks;
         int[][] validMoves;
@@ -115,33 +121,39 @@ public class PawnMoveGenerator extends MoveGenerator{
         }
 
         for(var dir : validAttacks){
-            ChessPosition new_pos = getPosFromVector(pos,dir,1);
-            if(board.isValid(new_pos)){
-                ChessMove move = new ChessMove(pos,new_pos,null);
-                valid_positions.add(move);
+            ChessPosition newPos = getPosFromVector(pos,dir,1);
+            if(board.isValid(newPos)){
+                ChessMove move = new ChessMove(pos,newPos,null);
+                validPositions.add(move);
             }
         }
 
 
-        ChessPosition new_pos = getPosFromVector(pos,validMoves[0], 1);
-        if(validPosition(board,new_pos,piece)){
-            if(board.getPiece(new_pos) == null){
-                ChessMove move = new ChessMove(pos,new_pos,null);
-                valid_positions.add(move);
-                if(canDouble){
-                    new_pos = getPosFromVector(pos,validMoves[1], 1);
-                    if(board.getPiece(new_pos) == null){
-                        if(validPosition(board,new_pos,piece)) {
-                            move = new ChessMove(pos,new_pos,null);
-                            valid_positions.add(move);
-                        }
-                    }
+        ChessPosition newPos = getPosFromVector(pos,validMoves[0], 1);
+        for (int i = 0; i < 1; i++){
+            if(!validPosition(board,newPos,piece)){
+                break;
+            }
+            if(board.getPiece(newPos) != null){
+                break;
+            }
+            ChessMove move = new ChessMove(pos,newPos,null);
+            validPositions.add(move);
+            if(!canDouble){
+                break;
+            }
+            newPos = getPosFromVector(pos,validMoves[1], 1);
+            if(board.getPiece(newPos) == null){
+                if(validPosition(board,newPos,piece)) {
+                    move = new ChessMove(pos,newPos,null);
+                    validPositions.add(move);
                 }
             }
         }
+
         ArrayList<ChessMove> promotedPositions = new ArrayList<>();
 
-        for (var move : valid_positions){
+        for (var move : validPositions){
             if(move.getEndPosition().getRow() == 1 || move.getEndPosition().getRow() == 8){
                 promotedPositions.add(new ChessMove(move.getStartPosition(),move.getEndPosition(), ChessPiece.PieceType.BISHOP));
                 promotedPositions.add(new ChessMove(move.getStartPosition(),move.getEndPosition(), ChessPiece.PieceType.ROOK));

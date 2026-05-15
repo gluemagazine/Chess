@@ -1,4 +1,4 @@
-package chess.MoveGenerators;
+package chess.movegenerators;
 import chess.*;
 
 import java.util.Collection;
