@@ -125,11 +125,11 @@ public class ChessGame {
 
     public ChessBoard makeBoardFromMove(ChessMove move){
 
-        ChessBoard copy = new ChessBoard();
-        for (int i = 0; i < 8; i++){
-            for(int j = 0; j < 9; j++){
-                copy.addPiece(new ChessPosition(i+1,j+1),board.getPiece(new ChessPosition(i+1,j+1)));
-            }
+        ChessBoard copy;
+        try {
+            copy = board.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
         }
         copy.setBlackEnPasant(board.getBlackEnPasant());
         copy.setWhiteEnPasant(board.getWhiteEnPasant());
@@ -371,12 +371,13 @@ public class ChessGame {
     private void updatePieces(ChessBoard board){
         blackPieces.clear();
         whitePieces.clear();
-        ChessBoard copy = new ChessBoard();
-        for (int i = 0; i < 8; i++){
-            for(int j = 0; j < 9; j++){
-                copy.addPiece(new ChessPosition(i+1,j+1),board.getPiece(new ChessPosition(i+1,j+1)));
-            }
+        ChessBoard copy;
+        try{
+            copy = board.clone();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
+
         for (int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
                 ChessPiece at = board.getPiece(new ChessPosition(i+1,j+1));

@@ -136,7 +136,13 @@ public class ChessBoard {
     public ChessBoard clone() throws CloneNotSupportedException {
 //        ChessBoard chessBoard = (ChessBoard) super.clone();
         ChessBoard copy = new ChessBoard();
-        copy.squares = squares.clone();
+        for (int i = 0; i < 8; i++){
+            for(int j = 0; j < 9; j++){
+                copy.addPiece(new ChessPosition(i+1,j+1),getPiece(new ChessPosition(i+1,j+1)));
+            }
+        }
+        copy.blackEnPasant = blackEnPasant;
+        copy.whiteEnPasant = whiteEnPasant;
         return copy;
     }
 
