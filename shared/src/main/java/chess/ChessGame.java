@@ -17,8 +17,8 @@ public class ChessGame {
     final private HashSet<ChessPosition> whitePieces;
     private ChessPosition whiteKing;
     private ChessPosition blackKing;
-    private HashSet<ChessPosition> blackCastles;
-    private HashSet<ChessPosition> whiteCastles;
+    final private HashSet<ChessPosition> blackCastles;
+    final private HashSet<ChessPosition> whiteCastles;
 
 
     public ChessGame() {
@@ -51,12 +51,9 @@ public class ChessGame {
     public void setTeamTurn(TeamColor team) {
         turn = team;
         if (team == TeamColor.BLACK){
-            System.out.println(board.getBlackEnPasant());
             board.setWhiteEnPasant(new ChessPosition(-1,-1));
         }
         else {
-            System.out.println(board.getWhiteEnPasant());
-
             board.setBlackEnPasant(new ChessPosition(-1,-1));
         }
     }
@@ -126,11 +123,8 @@ public class ChessGame {
     public ChessBoard makeBoardFromMove(ChessMove move){
 
         ChessBoard copy;
-        try {
-            copy = board.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException(e);
-        }
+        copy = board.clone();
+
         copy.setBlackEnPasant(board.getBlackEnPasant());
         copy.setWhiteEnPasant(board.getWhiteEnPasant());
 
@@ -158,8 +152,6 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         updatePieces(board);
-        System.out.println("Starting to get moves");
-        System.out.println(board);
         ChessPiece piece = board.getPiece(startPosition);
         if(piece == null){
             return null;
@@ -251,7 +243,6 @@ public class ChessGame {
         updatePieces(board);
         if(piece.getPieceType() == ChessPiece.PieceType.PAWN){
             if(board.getBlackEnPasant().equals( move.getEndPosition())){
-                System.out.println("I did one?");
                 board.setPiece(new ChessPosition(move.getStartPosition().getRow(), move.getEndPosition().getColumn()), null);
             }
             else if (board.getWhiteEnPasant().equals( move.getEndPosition())){
@@ -371,12 +362,6 @@ public class ChessGame {
     private void updatePieces(ChessBoard board){
         blackPieces.clear();
         whitePieces.clear();
-        ChessBoard copy;
-        try{
-            copy = board.clone();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
 
         for (int i = 0; i < 8; i++){
             for(int j = 0; j < 8; j++){
@@ -397,9 +382,6 @@ public class ChessGame {
                     }
                 }
             }
-        }
-        if (!copy.equals(board)){
-            System.out.println("There was a problem");
         }
     }
 

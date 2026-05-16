@@ -9,7 +9,7 @@ import java.util.Objects;
  * Note: You can add to this class, but you may not alter
  * signature of the existing methods.
  */
-public class ChessBoard {
+public class ChessBoard implements Cloneable{
 
     ChessPiece[][] squares = new ChessPiece[8][8];
     private ChessPosition blackEnPasant;
@@ -133,17 +133,19 @@ public class ChessBoard {
     }
 
     @Override
-    public ChessBoard clone() throws CloneNotSupportedException {
-//        ChessBoard chessBoard = (ChessBoard) super.clone();
-        ChessBoard copy = new ChessBoard();
-        for (int i = 0; i < 8; i++){
-            for(int j = 0; j < 9; j++){
-                copy.addPiece(new ChessPosition(i+1,j+1),getPiece(new ChessPosition(i+1,j+1)));
+    public ChessBoard clone(){
+        try {
+            ChessBoard copy = (ChessBoard) super.clone();
+            copy.squares = new ChessPiece[8][8];
+            for (int i = 0; i < 8; i++){
+                for(int j = 0; j < 9; j++){
+                    copy.addPiece(new ChessPosition(i+1,j+1),getPiece(new ChessPosition(i+1,j+1)));
+                }
             }
+            return copy;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        copy.blackEnPasant = blackEnPasant;
-        copy.whiteEnPasant = whiteEnPasant;
-        return copy;
     }
 
     public ChessPosition getBlackEnPasant() {
@@ -152,8 +154,6 @@ public class ChessBoard {
 
     public void setBlackEnPasant(ChessPosition newPesants) {
         blackEnPasant = newPesants;
-        System.out.println("black: " + newPesants);
-
     }
 
     public ChessPosition getWhiteEnPasant() {
@@ -162,6 +162,5 @@ public class ChessBoard {
 
     public void setWhiteEnPasant(ChessPosition newPesants) {
         whiteEnPasant = newPesants;
-        System.out.println("white: " + newPesants);
     }
 }
