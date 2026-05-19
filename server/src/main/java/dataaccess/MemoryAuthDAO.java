@@ -11,7 +11,7 @@ public class MemoryAuthDAO implements AuthDAO{
 
     HashMap<String,String> tokens;
 
-    MemoryAuthDAO(){
+    public MemoryAuthDAO(){
         tokens = new HashMap<>();
     }
 

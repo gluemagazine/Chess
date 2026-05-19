@@ -1,6 +1,9 @@
 package dataaccess;
 
-public interface UserDAO {
+import model.UserData;
 
-    void clear();
+public interface UserDAO {
+    void createUser(UserData userData) throws DataAccessException;
+    UserData getUser(String username) throws DataAccessException;
+    void clear() ;
 }
