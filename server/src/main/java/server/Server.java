@@ -19,7 +19,7 @@ public class Server {
         AuthDAO authDAO = new MemoryAuthDAO();
         users = new UserService(userDAO,authDAO);
         auth = new DataService(authDAO);
-        games = new GameService(new MemoryGameDAO());
+        games = new GameService(new MemoryGameDAO(),authDAO,userDAO);
 
         // Register your endpoints and exception handlers here.
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
