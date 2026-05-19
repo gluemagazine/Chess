@@ -1,10 +1,11 @@
 package server.handlers;
 
+import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
+import model.*;
 import org.jetbrains.annotations.NotNull;
-import service.DataService;
-import service.GameService;
-import service.UserService;
+import service.*;
 
 public class LoginHandler extends BasicHandler{
     public LoginHandler(UserService users, DataService auth, GameService games) {
@@ -14,5 +15,20 @@ public class LoginHandler extends BasicHandler{
     @Override
     public void handle(@NotNull Context context) throws Exception {
         System.out.println("This is a login handler");
+        Gson gson = new Gson();
+
+        LoginRequest request = gson.fromJson(context.body(),LoginRequest.class);
+
+        try{
+            LoginResult result = users.login(request);
+            context.json(gson.toJson(result));
+            context.status(200);
+        }
+        catch (DataAccessException ex){
+            context.json(gson.toJson(ex));
+            System.out.println(gson.toJson(ex));
+            context.status(401);
+        }
+
     }
 }

@@ -17,4 +17,7 @@ public abstract class BasicHandler implements Handler {
         this.auth = auth;
         this.games = games;
     }
+
+    public record ErrorWraper(String message){
+    }
 }

@@ -14,5 +14,8 @@ public class DeleteDBHandler extends BasicHandler{
     @Override
     public void handle(@NotNull Context context) throws Exception {
         System.out.println("This is a delete db handler");
+        users.clear();
+        auth.clear();
+        games.clear();
     }
 }

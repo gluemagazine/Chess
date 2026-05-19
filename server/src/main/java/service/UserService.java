@@ -21,7 +21,10 @@ public class UserService {
 
         UserData result = users.getUser(request.username());
         if(result == null){
-            throw new DataAccessException("Unauthorized");
+            throw new DataAccessException("Error: unauthorized");
+        }
+        if (!(request.password().equals(result.password()))){
+            throw new DataAccessException("Error: unauthorized");
         }
         String token = auth.createAuth(result.username());
 
@@ -39,6 +42,10 @@ public class UserService {
         String token = auth.createAuth(request.username());
 
         return new RegisterResult(request.username(),token);
+    }
+
+    public void clear(){
+        users.clear();
     }
 
 }

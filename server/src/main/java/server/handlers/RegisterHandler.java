@@ -21,13 +21,16 @@ public class RegisterHandler extends BasicHandler{
 
         try {
             RegisterResult result = users.register(request);
-
+            context.json(gson.toJson(result));
+            context.status(200);
         }
         catch (AlreadyTakenException ex) {
-            context.json(gson.toJson(ex));
+            context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
             context.status(403);
         }
-
-
+        catch (Exception e){
+            context.json(gson.toJson(new ErrorWraper(e.getMessage())));
+            context.status(400);
+        }
     }
 }
