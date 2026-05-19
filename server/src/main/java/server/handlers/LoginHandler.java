@@ -1,6 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataaccess.BadCredentialsException;
 import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import model.*;
@@ -24,9 +25,12 @@ public class LoginHandler extends BasicHandler{
             context.json(gson.toJson(result));
             context.status(200);
         }
+        catch (BadCredentialsException ex){
+            context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
+            context.status(400);
+        }
         catch (DataAccessException ex){
-            context.json(gson.toJson(ex));
-            System.out.println(gson.toJson(ex));
+            context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
             context.status(401);
         }
 

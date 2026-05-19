@@ -1,10 +1,7 @@
 package service;
 
 
-import dataaccess.AlreadyTakenException;
-import dataaccess.AuthDAO;
-import dataaccess.DataAccessException;
-import dataaccess.UserDAO;
+import dataaccess.*;
 import model.*;
 
 public class UserService {
@@ -20,6 +17,9 @@ public class UserService {
     public LoginResult login(LoginRequest request) throws DataAccessException {
 
         UserData result = users.getUser(request.username());
+        if(request.username() == null || request.password() == null){
+            throw new BadCredentialsException("Error: bad request");
+        }
         if(result == null){
             throw new DataAccessException("Error: unauthorized");
         }
