@@ -21,7 +21,7 @@ public class ListGamesHandler extends BasicHandler{
         Gson gson = new Gson();
 
         try {
-            ArrayList<GameData> response = games.listGames(new ListGamesRequest(context.header("authorization")));
+            ListGamesResult response = games.listGames(new ListGamesRequest(context.header("authorization")));
             context.json(gson.toJson(response));
             context.status(200);
         } catch(InvalidAuthException ex){

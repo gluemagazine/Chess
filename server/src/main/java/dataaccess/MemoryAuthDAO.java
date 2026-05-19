@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO{
 
-    HashMap<String,String> tokens;
+    private HashMap<String,String> tokens;
 
     public MemoryAuthDAO(){
         tokens = new HashMap<>();

@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public class MemoryGameDAO implements GameDAO{
 
-    private final HashMap<Integer,GameData> data;
+    private HashMap<Integer,GameData> data;
     private int nextID;
 
     public MemoryGameDAO(){
@@ -26,7 +26,8 @@ public class MemoryGameDAO implements GameDAO{
 
     public String createGame(String gameName){
         int ID = getNextID();
-        data.put(ID,new GameData(ID,"","",gameName,new ChessGame()));
+        data.remove(ID);
+        data.put(ID,new GameData(ID,null,null,gameName,new ChessGame()));
         return String.valueOf(ID);
     }
 
