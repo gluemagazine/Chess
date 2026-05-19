@@ -2,6 +2,7 @@ package server.handlers;
 
 import com.google.gson.Gson;
 import dataaccess.AlreadyTakenException;
+import dataaccess.BadCredentialsException;
 import io.javalin.http.Context;
 import model.*;
 import org.jetbrains.annotations.NotNull;
@@ -28,8 +29,8 @@ public class RegisterHandler extends BasicHandler{
             context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
             context.status(403);
         }
-        catch (Exception e){
-            context.json(gson.toJson(new ErrorWraper(e.getMessage())));
+        catch (BadCredentialsException ex ){
+            context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
             context.status(400);
         }
     }

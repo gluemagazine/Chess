@@ -37,6 +37,10 @@ public class UserService {
             throw new AlreadyTakenException("Error: Username already taken");
         }
 
+        if(request.username() == null || request.password() == null || request.email() == null){
+            throw new BadCredentialsException("Error: bad request");
+        }
+
         users.createUser(new UserData(request.username(),request.password(), request.email()));
 
         String token = auth.createAuth(request.username());

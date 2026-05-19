@@ -14,5 +14,6 @@ public class LogOutHandler extends BasicHandler{
     @Override
     public void handle(@NotNull Context context) throws Exception {
         System.out.println("I logged out!!!");
+
     }
 }
