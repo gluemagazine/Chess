@@ -48,6 +48,16 @@ public class UserService {
         return new RegisterResult(request.username(),token);
     }
 
+    public void logout(LogoutRequest request) throws Exception{
+        AuthData result = auth.getAuthFromToken(request.authToken());
+
+        if (result == null){
+            throw new InvalidAuthException("Error: unauthorized");
+        }
+
+        auth.deleteAuth(result);
+    }
+
     public void clear(){
         users.clear();
     }

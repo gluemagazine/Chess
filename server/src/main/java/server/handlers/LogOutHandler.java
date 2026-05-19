@@ -1,6 +1,10 @@
 package server.handlers;
 
+import com.google.gson.Gson;
+import dataaccess.AlreadyTakenException;
+import dataaccess.InvalidAuthException;
 import io.javalin.http.Context;
+import model.LogoutRequest;
 import org.jetbrains.annotations.NotNull;
 import service.DataService;
 import service.GameService;
@@ -15,5 +19,16 @@ public class LogOutHandler extends BasicHandler{
     public void handle(@NotNull Context context) throws Exception {
         System.out.println("I logged out!!!");
 
+        Gson gson = new Gson();
+
+        LogoutRequest request = new LogoutRequest(context.header("authorization"));
+        try {
+            users.logout(request);
+            context.status(200);
+        }
+        catch(InvalidAuthException ex){
+            context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
+            context.status(401);
+        }
     }
 }
