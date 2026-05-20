@@ -25,10 +25,10 @@ public class MemoryGameDAO implements GameDAO{
     }
 
     public String createGame(String gameName){
-        int ID = getNextID();
-        data.remove(ID);
-        data.put(ID,new GameData(ID,null,null,gameName,new ChessGame()));
-        return String.valueOf(ID);
+        int gameID = getNextID();
+        data.remove(gameID);
+        data.put(gameID,new GameData(gameID,null,null,gameName,new ChessGame()));
+        return String.valueOf(gameID);
     }
 
     public ArrayList<GameData> listGames (){
