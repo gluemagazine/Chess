@@ -17,9 +17,10 @@ public class Server {
     public Server() {
         UserDAO userDAO = new MemoryUserDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
+        GameDAO gameDAO = new MemoryGameDAO();
         users = new UserService(userDAO,authDAO);
-        auth = new DataService(authDAO);
-        games = new GameService(new MemoryGameDAO(),authDAO,userDAO);
+        auth = new DataService(authDAO,gameDAO,userDAO);
+        games = new GameService(gameDAO,authDAO,userDAO);
 
         // Register your endpoints and exception handlers here.
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
@@ -30,9 +31,6 @@ public class Server {
         javalin.post("/game", new CreateGameHandler(users,auth,games));
         javalin.put("/game", new JoinGameHandler(users,auth,games));
         javalin.delete("/db", new DeleteDBHandler(users,auth,games));
-
-
-
     }
 
     public int run(int desiredPort) {
