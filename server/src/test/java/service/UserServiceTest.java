@@ -105,13 +105,7 @@ class UserServiceTest {
 
     @Test
     void clear() {
-        try {
-            RegisterResult result = user.register(new RegisterRequest("ExistingUser","password","example"));
-            Assertions.assertNotNull(result.authToken());
-            Assertions.assertEquals("ExistingUser",result.username());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        registerSuccessful();
         user.clear();
         data.clear();
         Assertions.assertThrows(DataAccessException.class, ()-> user.login(new LoginRequest("ExistingUser","password")));
