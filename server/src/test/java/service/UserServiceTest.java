@@ -74,13 +74,7 @@ class UserServiceTest {
 
     @Test
     void registerExistingUser(){
-        try {
-            RegisterResult result = user.register(new RegisterRequest("ExistingUser","password","example"));
-            Assertions.assertNotNull(result.authToken());
-            Assertions.assertEquals("ExistingUser",result.username());
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        registerSuccessful();
 
         Assertions.assertThrows(AlreadyTakenException.class, ()->user.register(new RegisterRequest("ExistingUser","password","example")));
     }
