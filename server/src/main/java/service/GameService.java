@@ -16,7 +16,7 @@ public class GameService {
         this.user = user;
     }
 
-    public CreateGameResult createGame(CreateGameRequest request) throws Exception{
+    public CreateGameResult createGame(CreateGameRequest request) throws DataAccessException{
         AuthData result = auth.getAuthFromToken(request.authToken());
         if(result == null){
             throw new InvalidAuthException("Error: unauthorized");
@@ -28,7 +28,7 @@ public class GameService {
         return new CreateGameResult(games.createGame(request.gameName()));
     }
 
-    public void joinGame(JoinGameRequest request) throws Exception{
+    public void joinGame(JoinGameRequest request) throws DataAccessException{
         AuthData result = auth.getAuthFromToken(request.authToken());
         if(result == null){
             throw new InvalidAuthException("Error: unauthorized");
@@ -52,10 +52,9 @@ public class GameService {
         String player = result.username();
         GameData newData = (request.playerColor() == ChessGame.TeamColor.WHITE) ? response.changeWhite(player) : response.changeBlack(player);
         games.updateGame(request.gameID(),newData);
-
     }
 
-    public ListGamesResult listGames(ListGamesRequest request) throws Exception{
+    public ListGamesResult listGames(ListGamesRequest request) throws DataAccessException{
         AuthData result = auth.getAuthFromToken(request.authToken());
         if(result == null){
             throw new InvalidAuthException("Error: unauthorized");

@@ -1,7 +1,6 @@
 package dataaccess;
 
 import dataaccess.Exceptions.DataAccessException;
-import dataaccess.Exceptions.ResponseException;
 import model.AuthData;
 
 import java.sql.Connection;
@@ -16,8 +15,8 @@ public class MySQLAuthDAO implements AuthDAO{
     public MySQLAuthDAO() throws DataAccessException {
         try {
             configureDatabase();
-        } catch (Exception _){
-
+        } catch (Exception e){
+            throw new DataAccessException(e.getMessage(),e);
         }
     }
 
@@ -65,7 +64,7 @@ public class MySQLAuthDAO implements AuthDAO{
                 ResultSet rs = stmt.executeQuery()) {
 
                 while(rs.next()) {
-                    tokens.put(rs.getString("authtoken"),rs.getString("username"));
+                    tokens.put(rs.getString("authToken"),rs.getString("username"));
                 }
             }
 
@@ -95,7 +94,6 @@ public class MySQLAuthDAO implements AuthDAO{
 
                 stmt.setString(1, token);
                 stmt.setString(2, username);
-
                 stmt.executeUpdate();
 
             }
@@ -107,9 +105,9 @@ public class MySQLAuthDAO implements AuthDAO{
                     connection.rollback();
                 }
             } catch (SQLException ex) {
-                return null;
+                throw new DataAccessException(ex.getMessage(),ex);
             }
-            return null;
+            throw new DataAccessException(e.getMessage(),e);
         }
 
         return token;
@@ -144,7 +142,7 @@ public class MySQLAuthDAO implements AuthDAO{
 
     private final String[] createStatements = {
             """
-            CREATE TABLE `auth` (
+            CREATE TABLE if not exists `auth` (
               `authToken` varchar(200) NOT NULL,
               `username` varchar(100) NOT NULL,
               PRIMARY KEY (`authToken`)

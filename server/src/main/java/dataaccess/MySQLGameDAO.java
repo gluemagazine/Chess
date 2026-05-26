@@ -41,6 +41,11 @@ public class MySQLGameDAO implements GameDAO{
                 stmt.executeUpdate();
             }
 
+            sql = "ALTER TABLE games AUTO_INCREMENT = 1";
+            try(PreparedStatement resetAutoIncrementStatement = connection.prepareStatement(sql)) {
+                resetAutoIncrementStatement.executeUpdate();
+            }
+
             connection.commit();
         } catch (SQLException e){
             try {
@@ -61,14 +66,18 @@ public class MySQLGameDAO implements GameDAO{
             connection = DatabaseManager.getConnection();
             connection.setAutoCommit(false);
 
-            String sql = "insert into games (gameName, whiteUsername, blackUsername, JSON) values (?, ?, ?, ?)";
+            String sql = "update games SET gameName = ?, whiteUsername = ?, blackUsername = ?, JSON = ?  where gameID = ?";
 
             try(PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
 
                 stmt.setString(1, data.gameName());
                 stmt.setString(2, data.whiteUsername());
                 stmt.setString(3, data.blackUsername());
                 stmt.setString(4, toJson(data.game()));
+                stmt.setInt(5, data.gameID());
+
+                stmt.executeUpdate();
 
             }
 
@@ -175,7 +184,8 @@ public class MySQLGameDAO implements GameDAO{
                         String whiteUsername = rs.getString("whiteUsername");
                         String blackUsername = rs.getString("blackUsername");
                         String JSON = rs.getString("JSON");
-                        return new GameData(Integer.parseInt(thisID),gameName,whiteUsername,blackUsername,fromJson(JSON));
+                        GameData data = new GameData(Integer.parseInt(thisID),whiteUsername,blackUsername,gameName,fromJson(JSON));
+                        return data;
                     }
 
                 }
