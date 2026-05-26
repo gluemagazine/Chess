@@ -12,9 +12,10 @@ class DataServiceTest {
 
     @BeforeEach
     void createServices(){
-        UserDAO users = new MySQLUserDAO();
-        AuthDAO auth = new MySQLAuthDAO();
-        GameDAO games = new MySQLGameDAO();
+        DataAccessBundle bundle = new DataAccessBundle(false);
+        UserDAO users = bundle.userDAO;
+        AuthDAO auth = bundle.authDAO;
+        GameDAO games = bundle.gameDAO;
         data = new DataService(auth,games,users);
     }
 

@@ -2,16 +2,30 @@ package dataaccess;
 
 import dataaccess.Exceptions.DataAccessException;
 import model.AuthData;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 public class AuthDAOTests {
     private MySQLAuthDAO auth;
+
     @BeforeEach
-    void createAuthDAO(){
-        auth = new MySQLAuthDAO();
+    void createAuth(){
+        try {
+            auth = new MySQLAuthDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    @AfterEach
+    @BeforeEach
+    void clearAuthData(){
+        try {
+            auth.clear();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     @Test
     public void createAuthToken(){

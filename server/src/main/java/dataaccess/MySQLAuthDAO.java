@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class MySQLAuthDAO implements AuthDAO{
 
-    public MySQLAuthDAO() {
+    public MySQLAuthDAO() throws DataAccessException {
         try {
             configureDatabase();
         } catch (Exception _){
@@ -53,9 +53,6 @@ public class MySQLAuthDAO implements AuthDAO{
 
     @Override
     public AuthData getAuthFromToken(String authToken) throws DataAccessException {
-        /*
-        Insert code to get this from the database
-         */
         Connection connection = null;
         try {
             connection = DatabaseManager.getConnection();

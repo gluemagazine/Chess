@@ -19,9 +19,10 @@ class GameServiceTest {
 
     @BeforeEach
     void createServices(){
-        UserDAO users = new MySQLUserDAO();
-        AuthDAO auth = new MySQLAuthDAO();
-        GameDAO games = new MySQLGameDAO();
+        DataAccessBundle bundle = new DataAccessBundle(false);
+        UserDAO users = bundle.userDAO;
+        AuthDAO auth = bundle.authDAO;
+        GameDAO games = bundle.gameDAO;
         game = new GameService(games,auth,users);
         user = new UserService(users,auth);
         try {
