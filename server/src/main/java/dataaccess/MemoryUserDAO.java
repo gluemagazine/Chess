@@ -10,10 +10,12 @@ public class MemoryUserDAO implements UserDAO{
         users = new HashMap<>();
     }
 
+    @Override
     public void createUser(UserData userData) {
         users.put(userData.username(),userData);
     }
 
+    @Override
     public UserData getUser(String username) {
         if(users.containsKey(username)){
             return users.get(username);
@@ -21,6 +23,7 @@ public class MemoryUserDAO implements UserDAO{
         return null;
     }
 
+    @Override
     public void clear(){
         users.clear();
     }

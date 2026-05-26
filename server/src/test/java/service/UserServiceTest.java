@@ -14,9 +14,9 @@ class UserServiceTest {
 
     @BeforeEach
     void createServices(){
-        GameDAO games = new MemoryGameDAO();
-        AuthDAO auth = new MemoryAuthDAO();
-        UserDAO users = new MemoryUserDAO();
+        UserDAO users = new MySQLUserDAO();
+        AuthDAO auth = new MySQLAuthDAO();
+        GameDAO games = new MySQLGameDAO();
         user = new UserService(users,auth);
         data = new DataService(auth,games,users);
     }

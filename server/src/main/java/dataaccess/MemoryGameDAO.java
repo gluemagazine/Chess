@@ -20,10 +20,12 @@ public class MemoryGameDAO implements GameDAO{
         return nextID++;
     }
 
+    @Override
     public void updateGame(String gameID, GameData gameData){
         this.data.put(Integer.valueOf(gameID),gameData);
     }
 
+    @Override
     public String createGame(String gameName){
         int gameID = getNextID();
         data.remove(gameID);
@@ -31,14 +33,17 @@ public class MemoryGameDAO implements GameDAO{
         return String.valueOf(gameID);
     }
 
+    @Override
     public ArrayList<GameData> listGames (){
         return new ArrayList<>(data.values());
     }
 
+    @Override
     public GameData getGame(String gameID){
         return data.get(Integer.valueOf(gameID));
     }
 
+    @Override
     public void clear(){
         data.clear();
     }
