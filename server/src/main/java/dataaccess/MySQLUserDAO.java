@@ -1,16 +1,12 @@
 package dataaccess;
 
 import dataaccess.Exceptions.DataAccessException;
-import dataaccess.Exceptions.ResponseException;
-import model.AuthData;
 import model.UserData;
 
-import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 public class MySQLUserDAO implements UserDAO {
 
@@ -59,8 +55,6 @@ public class MySQLUserDAO implements UserDAO {
         try {
             connection = DatabaseManager.getConnection();
 
-            HashMap<String,UserData> users = new HashMap<>();
-
             String sql = "select username, password, email from users";
 
             try(PreparedStatement stmt = connection.prepareStatement(sql);
@@ -70,13 +64,11 @@ public class MySQLUserDAO implements UserDAO {
                     String thisUsername = rs.getString("username");
                     String thisPassword = rs.getString("password");
                     String thisEmail = rs.getString("email");
-                    UserData data = new UserData(thisUsername,thisPassword,thisEmail);
-                    users.put(thisUsername,data);
-                }
-            }
+                    if(thisUsername.equals(username)){
+                        return new UserData(thisUsername,thisPassword,thisEmail);
+                    }
 
-            if(users.containsKey(username)){
-                return users.get(username);
+                }
             }
             return null;
 

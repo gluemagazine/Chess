@@ -153,7 +153,7 @@ public class MySQLAuthDAO implements AuthDAO{
     };
 
 
-    private void configureDatabase() throws ResponseException, DataAccessException {
+    private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (Connection conn = DatabaseManager.getConnection()) {
             for (String statement : createStatements) {
@@ -162,7 +162,7 @@ public class MySQLAuthDAO implements AuthDAO{
                 }
             }
         } catch (SQLException ex) {
-            throw new ResponseException(ResponseException.Code.ServerError, String.format("Unable to configure database: %s", ex.getMessage()));
+            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()),ex);
         }
     }
 }

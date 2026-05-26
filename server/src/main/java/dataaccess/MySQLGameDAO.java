@@ -1,12 +1,11 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import dataaccess.Exceptions.DataAccessException;
-import dataaccess.Exceptions.ResponseException;
 import model.GameData;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class MySQLGameDAO implements GameDAO{
@@ -17,6 +16,16 @@ public class MySQLGameDAO implements GameDAO{
         } catch (Exception _){
 
         }
+    }
+
+    private String toJson(ChessGame game){
+        Gson gson = new Gson();
+        return gson.toJson(game);
+    }
+
+    private ChessGame fromJson(String gameJson){
+        Gson gson = new Gson();
+        return gson.fromJson(gameJson,ChessGame.class);
     }
 
     @Override
@@ -47,22 +56,136 @@ public class MySQLGameDAO implements GameDAO{
 
     @Override
     public void updateGame(String gameID, GameData data) throws DataAccessException{
+        Connection connection = null;
+        try {
+            connection = DatabaseManager.getConnection();
+            connection.setAutoCommit(false);
 
+            String sql = "insert into games (gameName, whiteUsername, blackUsername, JSON) values (?, ?, ?, ?)";
+
+            try(PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+                stmt.setString(1, data.gameName());
+                stmt.setString(2, data.whiteUsername());
+                stmt.setString(3, data.blackUsername());
+                stmt.setString(4, toJson(data.game()));
+
+            }
+
+            connection.commit();
+        } catch (SQLException e){
+            try {
+                if (connection != null && !connection.isClosed()) {
+                    connection.rollback();
+                }
+            } catch (SQLException ex) {
+                throw new DataAccessException(ex.getMessage(),ex);
+            }
+            throw new DataAccessException(e.getMessage(),e);
+        }
     }
 
     @Override
     public String createGame(String gameName) throws DataAccessException {
-        return "";
+        Connection connection = null;
+        int gameID;
+        try {
+            connection = DatabaseManager.getConnection();
+            connection.setAutoCommit(false);
+
+            String sql = "insert into games (gameName, whiteUsername, blackUsername, JSON) values (?, ?, ?, ?)";
+
+            try(PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+                stmt.setString(1, gameName);
+                stmt.setString(2, null);
+                stmt.setString(3, null);
+                stmt.setString(4, toJson(new ChessGame()));
+
+                if (stmt.executeUpdate() == 1){
+                    try (ResultSet resultSet = stmt.getGeneratedKeys()){
+                        resultSet.next();
+                        gameID = resultSet.getInt(1);
+                    }
+                }
+                else {
+                    gameID = -1;
+                }
+            }
+
+            connection.commit();
+            return String.valueOf(gameID);
+        } catch (SQLException e){
+            try {
+                if (connection != null && !connection.isClosed()) {
+                    connection.rollback();
+                }
+            } catch (SQLException ex) {
+                throw new DataAccessException(ex.getMessage(),ex);
+            }
+            throw new DataAccessException(e.getMessage(),e);
+        }
     }
 
     @Override
     public ArrayList<GameData> listGames() throws DataAccessException {
-        return null;
+        Connection connection = null;
+        ArrayList<GameData> games = new ArrayList<>();
+        try {
+            connection = DatabaseManager.getConnection();
+
+            String sql = "select gameID, gameName , whiteUsername, blackUsername, JSON from games";
+
+            try(PreparedStatement stmt = connection.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
+
+                while(rs.next()) {
+                    String thisID = rs.getString("gameID");
+                    String gameName = rs.getString("gameName");
+                    String whiteUsername = rs.getString("whiteUsername");
+                    String blackUsername = rs.getString("blackUsername");
+                    String JSON = rs.getString("JSON");
+                    GameData temp = new GameData(Integer.parseInt(thisID),whiteUsername,blackUsername,gameName,fromJson(JSON));
+                    games.add(temp);
+                }
+            }
+            return games;
+
+        } catch (SQLException e){
+
+            throw new DataAccessException(e.getMessage(),e);
+        }
     }
 
     @Override
     public GameData getGame(String gameID) throws DataAccessException {
-        return null;
+        Connection connection = null;
+        try {
+            connection = DatabaseManager.getConnection();
+
+            String sql = "select gameID, gameName , whiteUsername, blackUsername, JSON from games";
+
+            try(PreparedStatement stmt = connection.prepareStatement(sql);
+                ResultSet rs = stmt.executeQuery()) {
+
+                while(rs.next()) {
+                    String thisID = rs.getString("gameID");
+                    if(thisID.equals(gameID)){
+                        String gameName = rs.getString("gameName");
+                        String whiteUsername = rs.getString("whiteUsername");
+                        String blackUsername = rs.getString("blackUsername");
+                        String JSON = rs.getString("JSON");
+                        return new GameData(Integer.parseInt(thisID),gameName,whiteUsername,blackUsername,fromJson(JSON));
+                    }
+
+                }
+            }
+            return null;
+
+        } catch (SQLException e){
+
+            throw new DataAccessException(e.getMessage(),e);
+        }
     }
 
     private final String[] createStatements = {
