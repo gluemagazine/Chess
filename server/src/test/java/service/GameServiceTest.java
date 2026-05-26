@@ -27,6 +27,9 @@ class GameServiceTest {
         game = new GameService(games,auth,users);
         user = new UserService(users,auth);
         try {
+            game.clear();
+            user.clear();
+            bundle.authDAO.clear();
             RegisterResult result = user.register(new RegisterRequest("ExistingUser","password","example"));
             goodToken = result.authToken();
         } catch (Exception e) {

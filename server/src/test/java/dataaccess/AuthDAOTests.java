@@ -7,19 +7,11 @@ import org.junit.jupiter.api.*;
 public class AuthDAOTests {
     private MySQLAuthDAO auth;
 
-    @BeforeEach
-    void createAuth(){
-        try {
-            auth = new MySQLAuthDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @AfterEach
     @BeforeEach
     void clearAuthData(){
         try {
+            auth = new MySQLAuthDAO();
             auth.clear();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);

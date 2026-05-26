@@ -23,6 +23,12 @@ class UserServiceTest {
         GameDAO games = bundle.gameDAO;
         user = new UserService(users,auth);
         data = new DataService(auth,games,users);
+        try {
+            user.clear();
+            data.clear();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test

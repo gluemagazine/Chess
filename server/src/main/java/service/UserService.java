@@ -7,6 +7,7 @@ import dataaccess.Exceptions.BadCredentialsException;
 import dataaccess.Exceptions.DataAccessException;
 import dataaccess.Exceptions.InvalidAuthException;
 import model.*;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
 
@@ -27,7 +28,7 @@ public class UserService {
         if(result == null){
             throw new DataAccessException("Error: unauthorized");
         }
-        if (!(request.password().equals(result.password()))){
+        if (!(BCrypt.checkpw(request.password(), result.password()))){
             throw new DataAccessException("Error: unauthorized");
         }
         String token = auth.createAuth(result.username());
@@ -44,8 +45,8 @@ public class UserService {
         if(request.username() == null || request.password() == null || request.email() == null){
             throw new BadCredentialsException("Error: bad request");
         }
-
-        users.createUser(new UserData(request.username(),request.password(), request.email()));
+        String hashed = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+        users.createUser(new UserData(request.username(),hashed, request.email()));
 
         String token = auth.createAuth(request.username());
 
