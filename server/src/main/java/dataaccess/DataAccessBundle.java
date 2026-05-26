@@ -1,7 +1,7 @@
 package dataaccess;
 
 
-import dataaccess.Exceptions.DataAccessException;
+import dataaccess.exceptions.DataAccessException;
 
 public class DataAccessBundle {
     public final UserDAO userDAO;

@@ -1,9 +1,9 @@
 package service;
 
 import dataaccess.*;
-import dataaccess.Exceptions.AlreadyTakenException;
-import dataaccess.Exceptions.BadCredentialsException;
-import dataaccess.Exceptions.DataAccessException;
+import dataaccess.exceptions.AlreadyTakenException;
+import dataaccess.exceptions.BadCredentialsException;
+import dataaccess.exceptions.DataAccessException;
 import model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

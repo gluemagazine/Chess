@@ -1,6 +1,4 @@
-package dataaccess.Exceptions;
-
-import javax.xml.crypto.Data;
+package dataaccess.exceptions;
 
 public class InvalidAuthException extends DataAccessException {
     public InvalidAuthException(String message) {

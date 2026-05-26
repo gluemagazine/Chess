@@ -2,8 +2,8 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.Exceptions.DataAccessException;
-import dataaccess.Exceptions.DataSQLException;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.DataSQLException;
 import model.GameData;
 
 import java.sql.*;

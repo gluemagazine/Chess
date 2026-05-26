@@ -2,10 +2,10 @@ package service;
 
 
 import dataaccess.*;
-import dataaccess.Exceptions.AlreadyTakenException;
-import dataaccess.Exceptions.BadCredentialsException;
-import dataaccess.Exceptions.DataAccessException;
-import dataaccess.Exceptions.InvalidAuthException;
+import dataaccess.exceptions.AlreadyTakenException;
+import dataaccess.exceptions.BadCredentialsException;
+import dataaccess.exceptions.DataAccessException;
+import dataaccess.exceptions.InvalidAuthException;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
 

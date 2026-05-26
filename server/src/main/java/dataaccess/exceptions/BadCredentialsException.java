@@ -1,4 +1,4 @@
-package dataaccess.Exceptions;
+package dataaccess.exceptions;
 
 public class BadCredentialsException extends DataAccessException {
     public BadCredentialsException(String message) {

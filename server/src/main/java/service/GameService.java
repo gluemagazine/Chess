@@ -2,7 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
-import dataaccess.Exceptions.*;
+import dataaccess.exceptions.*;
 import model.*;
 
 

@@ -1,4 +1,4 @@
-package dataaccess.Exceptions;
+package dataaccess.exceptions;
 
 /**
  * indicates that the username already exists
