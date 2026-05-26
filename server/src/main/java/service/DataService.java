@@ -15,11 +15,7 @@ public class DataService {
         this.users = users;
     }
 
-    public void clear(){
-        try {
-            auth.clear();
-        } catch( DataAccessException _){
-
-        }
+    public void clear() throws DataAccessException{
+        auth.clear();
     }
 }

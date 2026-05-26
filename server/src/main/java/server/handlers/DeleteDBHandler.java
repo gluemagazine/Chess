@@ -1,5 +1,8 @@
 package server.handlers;
 
+import com.google.gson.Gson;
+import dataaccess.Exceptions.DataAccessException;
+import dataaccess.Exceptions.DataSQLException;
 import io.javalin.http.Context;
 import org.jetbrains.annotations.NotNull;
 import service.DataService;
@@ -12,10 +15,18 @@ public class DeleteDBHandler extends BasicHandler{
     }
 
     @Override
-    public void handle(@NotNull Context context) throws Exception {
+    public void handle(@NotNull Context context) throws DataAccessException {
         System.out.println("This is a delete db handler");
-        users.clear();
-        auth.clear();
-        games.clear();
+        Gson gson = new Gson();
+        try {
+            users.clear();
+            auth.clear();
+            games.clear();
+        } catch(DataSQLException ex){
+
+            context.json(gson.toJson(new ErrorWrapper(ex.getMessage())));
+            context.status(500);
+        }
+
     }
 }

@@ -1,6 +1,5 @@
 package server.handlers;
 
-import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import service.DataService;
 import service.GameService;
@@ -18,6 +17,6 @@ public abstract class BasicHandler implements Handler {
         this.games = games;
     }
 
-    public record ErrorWraper(String message){
+    public record ErrorWrapper(String message){
     }
 }

@@ -3,6 +3,7 @@ package server.handlers;
 import com.google.gson.Gson;
 import dataaccess.Exceptions.AlreadyTakenException;
 import dataaccess.Exceptions.BadDataException;
+import dataaccess.Exceptions.DataSQLException;
 import dataaccess.Exceptions.InvalidAuthException;
 import io.javalin.http.Context;
 import model.JoinGameRequest;
@@ -27,14 +28,17 @@ public class JoinGameHandler extends BasicHandler{
             games.joinGame(request);
             context.status(200);
         } catch(InvalidAuthException ex){
-            context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
+            context.json(gson.toJson(new ErrorWrapper(ex.getMessage())));
             context.status(401);
         } catch(BadDataException ex){
-            context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
+            context.json(gson.toJson(new ErrorWrapper(ex.getMessage())));
             context.status(400);
         } catch (AlreadyTakenException ex){
-            context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
+            context.json(gson.toJson(new ErrorWrapper(ex.getMessage())));
             context.status(403);
+        } catch (DataSQLException ex){
+            context.json(gson.toJson(new ErrorWrapper(ex.getMessage())));
+            context.status(500);
         }
     }
 }

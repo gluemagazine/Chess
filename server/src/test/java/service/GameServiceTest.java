@@ -3,6 +3,7 @@ package service;
 import chess.ChessGame;
 import dataaccess.*;
 import dataaccess.Exceptions.AlreadyTakenException;
+import dataaccess.Exceptions.DataAccessException;
 import dataaccess.Exceptions.InvalidAuthException;
 import dataaccess.Exceptions.InvalidGameNameException;
 import model.*;
@@ -161,7 +162,11 @@ class GameServiceTest {
     void clear() {
         listGames();
 
-        game.clear();
+        try {
+            game.clear();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
 
         ListGamesResult listResult;
         try {

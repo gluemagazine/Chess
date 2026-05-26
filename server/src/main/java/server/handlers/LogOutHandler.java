@@ -1,6 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataaccess.Exceptions.DataSQLException;
 import dataaccess.Exceptions.InvalidAuthException;
 import io.javalin.http.Context;
 import model.LogoutRequest;
@@ -26,8 +27,11 @@ public class LogOutHandler extends BasicHandler{
             context.status(200);
         }
         catch(InvalidAuthException ex){
-            context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
+            context.json(gson.toJson(new ErrorWrapper(ex.getMessage())));
             context.status(401);
+        } catch (DataSQLException ex){
+            context.json(gson.toJson(new ErrorWrapper(ex.getMessage())));
+            context.status(500);
         }
     }
 }

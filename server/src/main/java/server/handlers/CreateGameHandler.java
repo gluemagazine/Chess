@@ -1,6 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataaccess.Exceptions.DataSQLException;
 import dataaccess.Exceptions.InvalidAuthException;
 import dataaccess.Exceptions.InvalidGameNameException;
 import io.javalin.http.Context;
@@ -28,11 +29,14 @@ public class CreateGameHandler extends BasicHandler{
             context.json(gson.toJson(response));
             context.status(200);
         } catch(InvalidAuthException ex){
-            context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
+            context.json(gson.toJson(new ErrorWrapper(ex.getMessage())));
             context.status(401);
         } catch (InvalidGameNameException ex){
-            context.json(gson.toJson(new ErrorWraper(ex.getMessage())));
+            context.json(gson.toJson(new ErrorWrapper(ex.getMessage())));
             context.status(400);
+        } catch (DataSQLException ex){
+            context.json(gson.toJson(new ErrorWrapper(ex.getMessage())));
+            context.status(500);
         }
     }
 }

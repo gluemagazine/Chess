@@ -63,13 +63,7 @@ public class GameService {
         return new ListGamesResult(games.listGames());
     }
 
-    public void clear(){
-        try {
-            games.clear();
-        } catch (DataAccessException _) {
-
-        }
+    public void clear() throws DataAccessException{
+        games.clear();
     }
-
-
 }

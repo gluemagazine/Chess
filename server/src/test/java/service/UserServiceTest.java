@@ -104,8 +104,12 @@ class UserServiceTest {
     @Test
     void clear() {
         registerSuccessful();
-        user.clear();
-        data.clear();
+        try {
+            user.clear();
+            data.clear();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
         Assertions.assertThrows(DataAccessException.class, ()-> user.login(new LoginRequest("ExistingUser","password")));
     }
 }

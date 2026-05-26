@@ -1,6 +1,7 @@
 package dataaccess;
 
 import dataaccess.Exceptions.DataAccessException;
+import dataaccess.Exceptions.DataSQLException;
 import model.UserData;
 
 import java.sql.Connection;
@@ -43,9 +44,9 @@ public class MySQLUserDAO implements UserDAO {
                     connection.rollback();
                 }
             } catch (SQLException ex) {
-                throw new DataAccessException(ex.getMessage(),ex);
+                throw new DataSQLException(ex.getMessage(),ex);
             }
-            throw new DataAccessException(e.getMessage(),e);
+            throw new DataSQLException(e.getMessage(),e);
         }
     }
 
@@ -74,7 +75,7 @@ public class MySQLUserDAO implements UserDAO {
 
         } catch (SQLException e){
 
-            throw new DataAccessException(e.getMessage(),e);
+            throw new DataSQLException(e.getMessage(),e);
         }
     }
 
@@ -98,9 +99,9 @@ public class MySQLUserDAO implements UserDAO {
                     connection.rollback();
                 }
             } catch (SQLException ex) {
-                throw new DataAccessException(ex.getMessage(),ex);
+                throw new DataSQLException(ex.getMessage(),ex);
             }
-            throw new DataAccessException(e.getMessage(),e);
+            throw new DataSQLException(e.getMessage(),e);
         }
     }
 
@@ -126,7 +127,7 @@ public class MySQLUserDAO implements UserDAO {
                 }
             }
         } catch (SQLException ex) {
-            throw new DataAccessException(String.format("Unable to configure database: %s", ex.getMessage()),ex);
+            throw new DataSQLException(String.format("Unable to configure database: %s", ex.getMessage()),ex);
         }
     }
 }

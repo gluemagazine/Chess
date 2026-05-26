@@ -35,7 +35,7 @@ public class UserService {
         return new LoginResult(result.username(),token);
     }
 
-    public RegisterResult register(RegisterRequest request) throws Exception {
+    public RegisterResult register(RegisterRequest request) throws DataAccessException {
         UserData result = users.getUser(request.username());
         if(result != null){
             throw new AlreadyTakenException("Error: Username already taken");
@@ -52,7 +52,7 @@ public class UserService {
         return new RegisterResult(request.username(),token);
     }
 
-    public void logout(LogoutRequest request) throws Exception{
+    public void logout(LogoutRequest request) throws DataAccessException{
         AuthData result = auth.getAuthFromToken(request.authToken());
 
         if (result == null){
@@ -62,12 +62,7 @@ public class UserService {
         auth.deleteAuth(result);
     }
 
-    public void clear(){
-        try {
-            users.clear();
-        } catch (DataAccessException _) {
-
-        }
+    public void clear() throws DataAccessException{
+        users.clear();
     }
-
 }

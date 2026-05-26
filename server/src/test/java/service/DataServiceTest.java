@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import dataaccess.Exceptions.DataAccessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -21,6 +22,10 @@ class DataServiceTest {
 
     @Test
     void clear() {
-        data.clear();
+        try {
+            data.clear();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
