@@ -2,6 +2,9 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
+import dataaccess.Exceptions.AlreadyTakenException;
+import dataaccess.Exceptions.InvalidAuthException;
+import dataaccess.Exceptions.InvalidGameNameException;
 import model.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

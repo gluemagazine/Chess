@@ -1,12 +1,11 @@
 package server.handlers;
 
 import com.google.gson.Gson;
-import dataaccess.InvalidAuthException;
-import dataaccess.InvalidGameNameException;
+import dataaccess.Exceptions.InvalidAuthException;
+import dataaccess.Exceptions.InvalidGameNameException;
 import io.javalin.http.Context;
 import model.CreateGameRequest;
 import model.CreateGameResult;
-import model.ListGamesRequest;
 import org.jetbrains.annotations.NotNull;
 import service.DataService;
 import service.GameService;

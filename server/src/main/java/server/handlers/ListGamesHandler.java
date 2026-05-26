@@ -1,14 +1,11 @@
 package server.handlers;
 
 import com.google.gson.Gson;
-import dataaccess.InvalidAuthException;
-import dataaccess.InvalidGameNameException;
+import dataaccess.Exceptions.InvalidAuthException;
 import io.javalin.http.Context;
 import model.*;
 import org.jetbrains.annotations.NotNull;
 import service.*;
-
-import java.util.ArrayList;
 
 public class ListGamesHandler extends BasicHandler{
     public ListGamesHandler(UserService users, DataService auth, GameService games) {

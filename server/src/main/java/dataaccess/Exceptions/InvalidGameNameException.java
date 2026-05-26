@@ -1,0 +1,7 @@
+package dataaccess.Exceptions;
+
+public class InvalidGameNameException extends DataAccessException {
+    public InvalidGameNameException(String message) {
+        super(message);
+    }
+}

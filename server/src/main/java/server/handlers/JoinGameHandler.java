@@ -1,12 +1,11 @@
 package server.handlers;
 
 import com.google.gson.Gson;
-import dataaccess.AlreadyTakenException;
-import dataaccess.BadDataException;
-import dataaccess.InvalidAuthException;
+import dataaccess.Exceptions.AlreadyTakenException;
+import dataaccess.Exceptions.BadDataException;
+import dataaccess.Exceptions.InvalidAuthException;
 import io.javalin.http.Context;
 import model.JoinGameRequest;
-import model.StringJoinGameRequest;
 import org.jetbrains.annotations.NotNull;
 import service.DataService;
 import service.GameService;

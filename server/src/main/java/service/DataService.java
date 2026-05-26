@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.AuthDAO;
+import dataaccess.Exceptions.DataAccessException;
 import dataaccess.GameDAO;
 import dataaccess.UserDAO;
 
@@ -15,6 +16,10 @@ public class DataService {
     }
 
     public void clear(){
-        auth.clear();
+        try {
+            auth.clear();
+        } catch( DataAccessException _){
+
+        }
     }
 }

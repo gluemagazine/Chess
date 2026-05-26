@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
+import dataaccess.Exceptions.*;
 import model.*;
 
 
@@ -64,7 +65,11 @@ public class GameService {
     }
 
     public void clear(){
-        games.clear();
+        try {
+            games.clear();
+        } catch (DataAccessException _) {
+
+        }
     }
 
 

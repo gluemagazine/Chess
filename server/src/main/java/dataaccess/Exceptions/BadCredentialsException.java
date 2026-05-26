@@ -1,6 +1,6 @@
-package dataaccess;
+package dataaccess.Exceptions;
 
-public class BadCredentialsException extends RuntimeException {
+public class BadCredentialsException extends DataAccessException {
     public BadCredentialsException(String message) {
         super(message);
     }

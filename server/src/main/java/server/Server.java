@@ -15,12 +15,11 @@ public class Server {
     private final GameService games;
 
     public Server() {
-        UserDAO userDAO = new MySQLUserDAO();
-        AuthDAO authDAO = new MySQLAuthDAO();
-        GameDAO gameDAO = new MySQLGameDAO();
-        users = new UserService(userDAO,authDAO);
-        auth = new DataService(authDAO,gameDAO,userDAO);
-        games = new GameService(gameDAO,authDAO,userDAO);
+        DataAccessBundle bundle = new DataAccessBundle(false);
+
+        users = new UserService(bundle.userDAO,bundle.authDAO);
+        auth = new DataService(bundle.authDAO,bundle.gameDAO,bundle.userDAO);
+        games = new GameService(bundle.gameDAO,bundle.authDAO,bundle.userDAO);
 
         // Register your endpoints and exception handlers here.
         javalin = Javalin.create(config -> config.staticFiles.add("web"));

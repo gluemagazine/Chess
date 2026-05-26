@@ -1,8 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
-import dataaccess.AlreadyTakenException;
-import dataaccess.InvalidAuthException;
+import dataaccess.Exceptions.InvalidAuthException;
 import io.javalin.http.Context;
 import model.LogoutRequest;
 import org.jetbrains.annotations.NotNull;

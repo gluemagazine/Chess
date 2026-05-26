@@ -1,9 +1,9 @@
-package dataaccess;
+package dataaccess.Exceptions;
 
 /**
  * indicates that the username already exists
  */
-public class AlreadyTakenException extends Exception {
+public class AlreadyTakenException extends DataAccessException {
     public AlreadyTakenException(String message) {
         super(message);
     }

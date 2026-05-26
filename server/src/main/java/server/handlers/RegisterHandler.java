@@ -1,8 +1,8 @@
 package server.handlers;
 
 import com.google.gson.Gson;
-import dataaccess.AlreadyTakenException;
-import dataaccess.BadCredentialsException;
+import dataaccess.Exceptions.AlreadyTakenException;
+import dataaccess.Exceptions.BadCredentialsException;
 import io.javalin.http.Context;
 import model.*;
 import org.jetbrains.annotations.NotNull;

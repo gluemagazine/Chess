@@ -2,6 +2,10 @@ package service;
 
 
 import dataaccess.*;
+import dataaccess.Exceptions.AlreadyTakenException;
+import dataaccess.Exceptions.BadCredentialsException;
+import dataaccess.Exceptions.DataAccessException;
+import dataaccess.Exceptions.InvalidAuthException;
 import model.*;
 
 public class UserService {
@@ -59,7 +63,11 @@ public class UserService {
     }
 
     public void clear(){
-        users.clear();
+        try {
+            users.clear();
+        } catch (DataAccessException _) {
+
+        }
     }
 
 }
