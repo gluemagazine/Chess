@@ -1,10 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
-import dataaccess.exceptions.AlreadyTakenException;
-import dataaccess.exceptions.BadDataException;
-import dataaccess.exceptions.DataSQLException;
-import dataaccess.exceptions.InvalidAuthException;
+import dataaccess.exceptions.*;
 import io.javalin.http.Context;
 import model.JoinGameRequest;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +15,7 @@ public class JoinGameHandler extends BasicHandler{
     }
 
     @Override
-    public void handle(@NotNull Context context) throws Exception {
+    public void handle(@NotNull Context context) throws DataAccessException {
         System.out.println("This is a join game handler");
         Gson gson = new Gson();
 

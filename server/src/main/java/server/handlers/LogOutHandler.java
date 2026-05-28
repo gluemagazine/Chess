@@ -1,6 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DataSQLException;
 import dataaccess.exceptions.InvalidAuthException;
 import io.javalin.http.Context;
@@ -16,7 +17,7 @@ public class LogOutHandler extends BasicHandler{
     }
 
     @Override
-    public void handle(@NotNull Context context) throws Exception {
+    public void handle(@NotNull Context context) throws DataAccessException {
         System.out.println("I logged out!!!");
 
         Gson gson = new Gson();

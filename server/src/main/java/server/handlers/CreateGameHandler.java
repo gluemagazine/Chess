@@ -1,6 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
+import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DataSQLException;
 import dataaccess.exceptions.InvalidAuthException;
 import dataaccess.exceptions.InvalidGameNameException;
@@ -18,7 +19,7 @@ public class CreateGameHandler extends BasicHandler{
     }
 
     @Override
-    public void handle(@NotNull Context context) throws Exception {
+    public void handle(@NotNull Context context) throws DataAccessException {
         System.out.println("This is a create game handler!!");
         Gson gson = new Gson();
         CreateGameRequest request = gson.fromJson(context.body(),CreateGameRequest.class);

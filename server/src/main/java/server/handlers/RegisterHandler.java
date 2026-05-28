@@ -3,6 +3,7 @@ package server.handlers;
 import com.google.gson.Gson;
 import dataaccess.exceptions.AlreadyTakenException;
 import dataaccess.exceptions.BadCredentialsException;
+import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DataSQLException;
 import io.javalin.http.Context;
 import model.*;
@@ -15,7 +16,7 @@ public class RegisterHandler extends BasicHandler{
     }
 
     @Override
-    public void handle(@NotNull Context context) throws Exception {
+    public void handle(@NotNull Context context) throws DataAccessException {
         System.out.println("I registered a user!!");
         Gson gson = new Gson();
 

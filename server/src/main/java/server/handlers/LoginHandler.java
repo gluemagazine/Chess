@@ -15,7 +15,7 @@ public class LoginHandler extends BasicHandler{
     }
 
     @Override
-    public void handle(@NotNull Context context) throws Exception {
+    public void handle(@NotNull Context context)  {
         System.out.println("This is a login handler");
         Gson gson = new Gson();
 
