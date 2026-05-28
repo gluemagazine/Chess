@@ -59,21 +59,4 @@ public class SQLDAOParent {
         }
     }
 
-
-    protected ResultSet getQuery(String request) throws DataAccessException {
-        Connection connection = null;
-        ArrayList<GameData> games = new ArrayList<>();
-        try {
-            connection = DatabaseManager.getConnection();
-
-            try(PreparedStatement stmt = connection.prepareStatement(request);
-                ResultSet rs = stmt.executeQuery()) {
-                return rs;
-            }
-
-        } catch (SQLException e){
-
-            throw new DataSQLException(e.getMessage(),e);
-        }
-    }
 }
