@@ -42,11 +42,8 @@ public class MySQLGameDAO extends SQLDAOParent implements GameDAO {
 
     @Override
     public void clear() throws DataAccessException{
-        Connection connection = null;
+        Connection connection = getConnection();
         try {
-            connection = DatabaseManager.getConnection();
-            connection.setAutoCommit(false);
-
             String sql = "delete from games";
 
             try(PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -57,18 +54,11 @@ public class MySQLGameDAO extends SQLDAOParent implements GameDAO {
             try(PreparedStatement resetAutoIncrementStatement = connection.prepareStatement(sql)) {
                 resetAutoIncrementStatement.executeUpdate();
             }
-
-            connection.commit();
-        } catch (SQLException e){
-            try {
-                if (connection != null && !connection.isClosed()) {
-                    connection.rollback();
-                }
-            } catch (SQLException ex) {
-                throw new DataSQLException(ex.getMessage(),ex);
-            }
+        } catch (SQLException e) {
             throw new DataSQLException(e.getMessage(),e);
         }
+        closeConnection(connection);
+
     }
 
     @Override
@@ -209,8 +199,4 @@ public class MySQLGameDAO extends SQLDAOParent implements GameDAO {
             throw new DataSQLException(e.getMessage(),e);
         }
     }
-
-
-
-
 }

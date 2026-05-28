@@ -91,29 +91,19 @@ public class MySQLUserDAO extends SQLDAOParent implements UserDAO {
 
     @Override
     public void clear() throws DataAccessException {
-        Connection connection = null;
-        try {
-            connection = DatabaseManager.getConnection();
-            connection.setAutoCommit(false);
+        Connection connection = getConnection();
 
+        try {
             String sql = "delete from users";
 
             try(PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.executeUpdate();
             }
-
-            connection.commit();
-        } catch (SQLException e){
-            try {
-                if (connection != null && !connection.isClosed()) {
-                    connection.rollback();
-                }
-            } catch (SQLException ex) {
-                throw new DataSQLException(ex.getMessage(),ex);
-            }
+        } catch (SQLException e) {
             throw new DataSQLException(e.getMessage(),e);
         }
-    }
 
+        closeConnection(connection);
 
+        }
 }

@@ -11,7 +11,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class MySQLAuthDAO extends SQLDAOParent implements AuthDAO{
+public class MySQLAuthDAO extends SQLDAOParent implements AuthDAO {
 
     public MySQLAuthDAO() throws DataAccessException {
         try {
@@ -34,28 +34,18 @@ public class MySQLAuthDAO extends SQLDAOParent implements AuthDAO{
 
     @Override
     public void clear() throws DataAccessException {
-        Connection connection = null;
+        Connection connection = getConnection();
+        String sql = "delete from auth";
+
         try {
-            connection = DatabaseManager.getConnection();
-            connection.setAutoCommit(false);
-
-            String sql = "delete from auth";
-
             try(PreparedStatement stmt = connection.prepareStatement(sql)) {
                 stmt.executeUpdate();
             }
-
-            connection.commit();
-        } catch (SQLException e){
-            try {
-                if (connection != null && !connection.isClosed()) {
-                    connection.rollback();
-                }
-            } catch (SQLException ex) {
-                throw new DataSQLException(ex.getMessage(),ex);
-            }
+        } catch (SQLException e) {
             throw new DataSQLException(e.getMessage(),e);
         }
+
+        closeConnection(connection);
     }
 
     @Override
