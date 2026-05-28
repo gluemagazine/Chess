@@ -1,9 +1,9 @@
 package service;
 
-import dataaccess.AuthDAO;
+import dataaccess.daointerfaces.AuthDAO;
 import dataaccess.exceptions.DataAccessException;
-import dataaccess.GameDAO;
-import dataaccess.UserDAO;
+import dataaccess.daointerfaces.GameDAO;
+import dataaccess.daointerfaces.UserDAO;
 
 public class DataService {
     private final AuthDAO auth;

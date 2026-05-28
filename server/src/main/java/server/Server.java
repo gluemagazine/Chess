@@ -1,7 +1,6 @@
 package server;
 
 import dataaccess.*;
-import dataaccess.UserDAO;
 import io.javalin.*;
 import server.handlers.*;
 import service.*;

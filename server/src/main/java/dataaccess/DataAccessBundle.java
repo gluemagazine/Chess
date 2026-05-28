@@ -1,7 +1,16 @@
 package dataaccess;
 
 
+import dataaccess.daointerfaces.AuthDAO;
+import dataaccess.daointerfaces.GameDAO;
+import dataaccess.daointerfaces.UserDAO;
 import dataaccess.exceptions.DataAccessException;
+import dataaccess.memorydaos.MemoryAuthDAO;
+import dataaccess.memorydaos.MemoryGameDAO;
+import dataaccess.memorydaos.MemoryUserDAO;
+import dataaccess.sqldataaccess.MySQLAuthDAO;
+import dataaccess.sqldataaccess.MySQLGameDAO;
+import dataaccess.sqldataaccess.MySQLUserDAO;
 
 public class DataAccessBundle {
     public final UserDAO userDAO;

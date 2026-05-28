@@ -1,5 +1,6 @@
-package dataaccess;
+package dataaccess.memorydaos;
 
+import dataaccess.daointerfaces.AuthDAO;
 import model.AuthData;
 import java.util.HashMap;
 
@@ -7,7 +8,7 @@ import java.util.UUID;
 
 
 
-public class MemoryAuthDAO implements AuthDAO{
+public class MemoryAuthDAO implements AuthDAO {
 
     private HashMap<String,String> tokens;
 

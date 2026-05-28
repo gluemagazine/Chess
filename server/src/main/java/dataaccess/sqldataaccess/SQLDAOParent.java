@@ -1,15 +1,10 @@
-package dataaccess;
+package dataaccess.sqldataaccess;
 
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DataSQLException;
-import model.GameData;
 
-import javax.xml.crypto.Data;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 public class SQLDAOParent {
     protected String createStatement;

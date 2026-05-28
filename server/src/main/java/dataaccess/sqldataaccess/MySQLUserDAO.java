@@ -1,5 +1,6 @@
-package dataaccess;
+package dataaccess.sqldataaccess;
 
+import dataaccess.daointerfaces.UserDAO;
 import dataaccess.exceptions.DataAccessException;
 import dataaccess.exceptions.DataSQLException;
 import model.UserData;
