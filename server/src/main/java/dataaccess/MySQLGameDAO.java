@@ -117,16 +117,9 @@ public class MySQLGameDAO extends SQLDAOParent implements GameDAO {
                 }
             }
 
-            connection.commit();
+            closeConnection(connection);
             return String.valueOf(gameID);
         } catch (SQLException e){
-            try {
-                if (connection != null && !connection.isClosed()) {
-                    connection.rollback();
-                }
-            } catch (SQLException ex) {
-                throw new DataSQLException(ex.getMessage(),ex);
-            }
             throw new DataSQLException(e.getMessage(),e);
         }
     }
