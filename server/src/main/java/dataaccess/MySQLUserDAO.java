@@ -9,13 +9,23 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class MySQLUserDAO implements UserDAO {
+public class MySQLUserDAO extends SQLDAOParent implements UserDAO {
 
-    public MySQLUserDAO() {
+    public MySQLUserDAO() throws DataAccessException {
         try {
+            createStatement = """
+            CREATE TABLE if not exists `users` (
+              `username` varchar(100) NOT NULL,
+              `password` varchar(200) NOT NULL,
+              `email` varchar(100) NOT NULL,
+              PRIMARY KEY (`username`),
+              UNIQUE KEY `userscol_UNIQUE` (`username`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """
+            ;
             configureDatabase();
         } catch (Exception e){
-
+            throw new DataAccessException(e.getMessage(),e);
         }
     }
 
@@ -105,29 +115,5 @@ public class MySQLUserDAO implements UserDAO {
         }
     }
 
-    private final String[] createStatements = {
-            """
-            CREATE TABLE `users` (
-              `username` varchar(100) NOT NULL,
-              `password` varchar(200) NOT NULL,
-              `email` varchar(100) NOT NULL,
-              PRIMARY KEY (`username`),
-              UNIQUE KEY `userscol_UNIQUE` (`username`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """
-    };
 
-
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataSQLException(String.format("Unable to configure database: %s", ex.getMessage()),ex);
-        }
-    }
 }

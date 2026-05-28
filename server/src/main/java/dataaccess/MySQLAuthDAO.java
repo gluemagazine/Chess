@@ -11,10 +11,17 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class MySQLAuthDAO implements AuthDAO{
+public class MySQLAuthDAO extends SQLDAOParent implements AuthDAO{
 
     public MySQLAuthDAO() throws DataAccessException {
         try {
+            createStatement = """
+            CREATE TABLE if not exists `auth` (
+              `authToken` varchar(200) NOT NULL,
+              `username` varchar(100) NOT NULL,
+              PRIMARY KEY (`authToken`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """;
             configureDatabase();
         } catch (Exception e){
             throw new DataAccessException(e.getMessage(),e);
@@ -141,27 +148,6 @@ public class MySQLAuthDAO implements AuthDAO{
         }
     }
 
-    private final String[] createStatements = {
-            """
-            CREATE TABLE if not exists `auth` (
-              `authToken` varchar(200) NOT NULL,
-              `username` varchar(100) NOT NULL,
-              PRIMARY KEY (`authToken`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """
-    };
 
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataSQLException(String.format("Unable to configure database: %s", ex.getMessage()),ex);
-        }
-    }
 }

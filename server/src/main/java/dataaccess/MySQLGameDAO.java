@@ -9,12 +9,23 @@ import model.GameData;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class MySQLGameDAO implements GameDAO{
+public class MySQLGameDAO extends SQLDAOParent implements GameDAO {
 
-    public MySQLGameDAO() {
+    public MySQLGameDAO() throws DataAccessException {
         try {
+            createStatement = """
+            CREATE TABLE if not exists `games` (
+              `gameID` int NOT NULL AUTO_INCREMENT,
+              `gameName` varchar(100) NOT NULL,
+              `whiteUsername` varchar(100) DEFAULT NULL,
+              `blackUsername` varchar(45) DEFAULT NULL,
+              `JSON` json NOT NULL,
+              PRIMARY KEY (`gameID`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+            """;
             configureDatabase();
         } catch (Exception e){
+            throw new DataAccessException(e.getMessage(),e);
         }
     }
 
@@ -154,8 +165,8 @@ public class MySQLGameDAO implements GameDAO{
                     String gameName = rs.getString("gameName");
                     String whiteUsername = rs.getString("whiteUsername");
                     String blackUsername = rs.getString("blackUsername");
-                    String JSON = rs.getString("JSON");
-                    GameData temp = new GameData(Integer.parseInt(thisID),whiteUsername,blackUsername,gameName,fromJson(JSON));
+                    String json = rs.getString("JSON");
+                    GameData temp = new GameData(Integer.parseInt(thisID),whiteUsername,blackUsername,gameName,fromJson(json));
                     games.add(temp);
                 }
             }
@@ -184,8 +195,8 @@ public class MySQLGameDAO implements GameDAO{
                         String gameName = rs.getString("gameName");
                         String whiteUsername = rs.getString("whiteUsername");
                         String blackUsername = rs.getString("blackUsername");
-                        String JSON = rs.getString("JSON");
-                        GameData data = new GameData(Integer.parseInt(thisID),whiteUsername,blackUsername,gameName,fromJson(JSON));
+                        String json = rs.getString("JSON");
+                        GameData data = new GameData(Integer.parseInt(thisID),whiteUsername,blackUsername,gameName,fromJson(json));
                         return data;
                     }
 
@@ -199,30 +210,7 @@ public class MySQLGameDAO implements GameDAO{
         }
     }
 
-    private final String[] createStatements = {
-            """
-            CREATE TABLE `games` (
-              `gameID` int NOT NULL AUTO_INCREMENT,
-              `gameName` varchar(100) NOT NULL,
-              `whiteUsername` varchar(100) DEFAULT NULL,
-              `blackUsername` varchar(45) DEFAULT NULL,
-              `JSON` json NOT NULL,
-              PRIMARY KEY (`gameID`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-            """
-    };
 
 
-    private void configureDatabase() throws DataAccessException {
-        DatabaseManager.createDatabase();
-        try (Connection conn = DatabaseManager.getConnection()) {
-            for (String statement : createStatements) {
-                try (var preparedStatement = conn.prepareStatement(statement)) {
-                    preparedStatement.executeUpdate();
-                }
-            }
-        } catch (SQLException ex) {
-            throw new DataSQLException(String.format("Unable to configure database: %s", ex.getMessage()),ex);
-        }
-    }
+
 }
