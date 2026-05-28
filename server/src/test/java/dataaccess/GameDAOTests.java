@@ -78,4 +78,16 @@ public class GameDAOTests {
             throw new RuntimeException(e);
         }
     }
+
+    @Test
+    public void badUpdateGame(){
+        try {
+            String result = bundle.gameDAO.createGame("TestGame1");
+            Assertions.assertEquals("1",result);
+            Assertions.assertThrows(Exception.class,() ->bundle.gameDAO.updateGame("1",null));
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

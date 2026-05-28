@@ -32,6 +32,11 @@ public class AuthDAOTests {
     }
 
     @Test
+    public void badCreateAuthToken(){
+        Assertions.assertThrows(DataAccessException.class,() ->auth.createAuth(null));
+    }
+
+    @Test
     public void clearAuth(){
         String[] tokens = new String[3];
         try {
@@ -60,8 +65,6 @@ public class AuthDAOTests {
         }
         Assertions.assertNotNull(token);
         Assertions.assertNotNull(data);
-        System.out.println(token);
-        System.out.println(data);
     }
 
     @Test
@@ -75,7 +78,5 @@ public class AuthDAOTests {
             throw new RuntimeException(e);
         }
         Assertions.assertNotNull(token);
-        System.out.println(token);
     }
-
 }
