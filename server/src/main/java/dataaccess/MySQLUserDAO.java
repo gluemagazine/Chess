@@ -56,7 +56,7 @@ public class MySQLUserDAO extends SQLDAOParent implements UserDAO {
     @Override
     public UserData getUser(String username) throws DataAccessException {
         if(username == null){
-            throw new DataAccessException("Error: no username provided");
+            return null;
         }
         Connection connection = null;
         try {
