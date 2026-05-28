@@ -14,7 +14,7 @@ public class MySQLUserDAO implements UserDAO {
     public MySQLUserDAO() {
         try {
             configureDatabase();
-        } catch (Exception _){
+        } catch (Exception e){
 
         }
     }

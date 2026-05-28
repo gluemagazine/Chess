@@ -14,8 +14,7 @@ public class MySQLGameDAO implements GameDAO{
     public MySQLGameDAO() {
         try {
             configureDatabase();
-        } catch (Exception _){
-
+        } catch (Exception e){
         }
     }
 
@@ -26,7 +25,8 @@ public class MySQLGameDAO implements GameDAO{
 
     private ChessGame fromJson(String gameJson){
         Gson gson = new Gson();
-        return gson.fromJson(gameJson,ChessGame.class);
+        ChessGame game = gson.fromJson(gameJson,ChessGame.class);
+        return game;
     }
 
     @Override
