@@ -1,11 +1,16 @@
 package dataaccess;
 
 import dataaccess.exceptions.DataAccessException;
+import model.UserData;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class UserDAOTests {
     DataAccessBundle bundle  = new DataAccessBundle(false);
+
+    private final UserData user = new UserData("Username","Password","Email");
 
     @AfterEach
     @BeforeEach
@@ -18,6 +23,28 @@ public class UserDAOTests {
         }
     }
 
+    @Test
+    void createUserTest(){
+        try {
+            bundle.userDAO.createUser(user);
+            UserData result = bundle.userDAO.getUser("Username");
+            Assertions.assertEquals("Username",result.username());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    @Test
+    void getUserTest(){
+        try {
+            bundle.userDAO.createUser(user);
+            UserData result = bundle.userDAO.getUser("Username");
+            Assertions.assertEquals("Username",result.username());
+            Assertions.assertEquals("Password",result.password());
+            Assertions.assertEquals("Email",result.email());
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }
