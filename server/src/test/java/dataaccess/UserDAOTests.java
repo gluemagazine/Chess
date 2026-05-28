@@ -35,6 +35,11 @@ public class UserDAOTests {
     }
 
     @Test
+    void badCreateUserTest(){
+        Assertions.assertThrows(Exception.class,() ->bundle.userDAO.createUser(null));
+    }
+
+    @Test
     void getUserTest(){
         try {
             bundle.userDAO.createUser(user);
@@ -45,6 +50,11 @@ public class UserDAOTests {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    void badGetUserTest(){
+        Assertions.assertThrows(Exception.class,() ->bundle.userDAO.getUser(null));
     }
 
 }

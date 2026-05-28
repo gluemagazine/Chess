@@ -91,6 +91,9 @@ public class MySQLGameDAO extends SQLDAOParent implements GameDAO {
 
     @Override
     public String createGame(String gameName) throws DataAccessException {
+        if (gameName == null){
+            throw new DataAccessException("Error: no name provided");
+        }
         Connection connection = null;
         int gameID;
         try {
@@ -156,6 +159,9 @@ public class MySQLGameDAO extends SQLDAOParent implements GameDAO {
 
     @Override
     public GameData getGame(String gameID) throws DataAccessException {
+        if (gameID == null){
+            throw new DataAccessException("Error: no name provided");
+        }
         Connection connection = null;
         try {
             connection = DatabaseManager.getConnection();

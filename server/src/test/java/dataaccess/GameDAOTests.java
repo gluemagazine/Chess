@@ -36,6 +36,11 @@ public class GameDAOTests {
     }
 
     @Test
+    void badCreateGame(){
+        Assertions.assertThrows(Exception.class,() ->bundle.gameDAO.createGame(null));
+    }
+
+    @Test
     void getGameTest(){
         try {
             String result = bundle.gameDAO.createGame("TestGame1");
@@ -45,6 +50,11 @@ public class GameDAOTests {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    void badGetGame(){
+        Assertions.assertThrows(Exception.class,() ->bundle.gameDAO.getGame(null));
     }
 
     @Test
@@ -63,6 +73,11 @@ public class GameDAOTests {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    public void badListGames(){
+        badCreateGame();
     }
 
     @Test

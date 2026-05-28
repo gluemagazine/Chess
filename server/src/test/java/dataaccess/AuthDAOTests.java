@@ -50,7 +50,11 @@ public class AuthDAOTests {
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    @Test
+    void badClearAuth(){
+        badCreateAuthToken();
     }
 
     @Test
@@ -68,6 +72,16 @@ public class AuthDAOTests {
     }
 
     @Test
+    public void badGetAuthData(){
+        try {
+            auth.createAuth("Testing123");
+            Assertions.assertNull(auth.getAuthFromToken(null));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
     public void deleteAuthData(){
         String token;
         try {
@@ -78,5 +92,15 @@ public class AuthDAOTests {
             throw new RuntimeException(e);
         }
         Assertions.assertNotNull(token);
+    }
+
+    @Test
+    public void badDeleteAuthData(){
+        try {
+            auth.createAuth("Testing123");
+            Assertions.assertThrows(Exception.class,() ->auth.deleteAuth(null));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
