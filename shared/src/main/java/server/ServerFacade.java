@@ -1,4 +1,4 @@
-package Server;
+package server;
 import com.google.gson.Gson;
 import model.*;
 
@@ -54,6 +54,12 @@ public class ServerFacade {
         return handleResponse(response,ListGamesResult.class);
     }
 
+    public void clear() throws DataAccessException{
+        var httpRequest = buildRequest("DELETE","/db",null,null);
+        var response = sendRequest(httpRequest);
+        handleResponse(response,null);
+    }
+
 
     private HttpRequest buildRequest(String method, String path, Object body, String authToken) {
         var request = HttpRequest.newBuilder()
@@ -91,7 +97,7 @@ public class ServerFacade {
             if (body != null) {
                 throw new DataAccessException(body);
             }
-            throw new DataAccessException("other failure: " + status);
+            throw new DataAccessException(status + body);
         }
         if (responseClass != null) {
             return new Gson().fromJson(response.body(), responseClass);
