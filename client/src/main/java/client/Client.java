@@ -2,18 +2,14 @@ package client;
 
 import chess.ChessGame;
 import model.*;
-import server.ServerFacade;
 
-import ui.EscapeSequences;
-
-import chess.ChessGame;
 import static ui.EscapeSequences.*;
 
 import java.util.ArrayList;
 
 public class Client {
 
-    public enum clientStates {
+    public enum ClientStates {
         LOGGED_OUT,
         LOGGED_IN,
         IN_GAME
@@ -43,12 +39,12 @@ public class Client {
     String invalidCommand = SET_TEXT_COLOR_RED + "Invalid command or arguments, type \"help\" to get a list of valid commands and parameters.";
 
 
-    private clientStates state;
+    private ClientStates state;
     private final ServerFacade server;
     private String authToken = null;
 
     public Client(String url){
-        state = clientStates.LOGGED_OUT;
+        state = ClientStates.LOGGED_OUT;
         server = new ServerFacade(url);
         new Repl(loggedOutHelp,this);
     }
@@ -101,12 +97,12 @@ public class Client {
         }
     }
 
-    private boolean validState(clientStates desired){
+    private boolean validState(ClientStates desired){
         return desired == state;
     }
 
     private void register (String username, String password, String email){
-        if(!validState(clientStates.LOGGED_OUT)){
+        if(!validState(ClientStates.LOGGED_OUT)){
             return;
         }
         try {
@@ -114,7 +110,7 @@ public class Client {
             if(response.username().equals(username) && response.authToken() != null ){
                 authToken = response.authToken();
                 System.out.println("Successfully logged in as " + username);
-                state = clientStates.LOGGED_IN;
+                state = ClientStates.LOGGED_IN;
                 new Repl(loggedInHelp,this);
             }
         } catch(Throwable e){
@@ -126,7 +122,7 @@ public class Client {
     }
 
     private void login(String username, String password){
-        if(!validState(clientStates.LOGGED_OUT)){
+        if(!validState(ClientStates.LOGGED_OUT)){
             return;
         }
         try {
@@ -134,7 +130,7 @@ public class Client {
             if(response.username().equals(username) && response.authToken() != null ){
                 authToken = response.authToken();
                 System.out.println("Successfully logged in as " + username);
-                state = clientStates.LOGGED_IN;
+                state = ClientStates.LOGGED_IN;
                 new Repl(loggedInHelp,this);
             }
         } catch(Throwable e){
@@ -147,12 +143,12 @@ public class Client {
     }
 
     private void logout(){
-        if(!validState(clientStates.LOGGED_IN)){
+        if(!validState(ClientStates.LOGGED_IN)){
             return;
         }
         try {
             server.logout(new LogoutRequest(authToken));
-            state = clientStates.LOGGED_OUT;
+            state = ClientStates.LOGGED_OUT;
         } catch(Throwable e){
             System.out.print(SET_TEXT_COLOR_RED);
 
@@ -161,7 +157,7 @@ public class Client {
     }
 
     private void createGame(String gameName){
-        if(!validState(clientStates.LOGGED_IN)){
+        if(!validState(ClientStates.LOGGED_IN)){
             return;
         }
         try {
@@ -181,7 +177,7 @@ public class Client {
     }
 
     private void joinGame(int id, String color){
-        if(!validState(clientStates.LOGGED_IN)){
+        if(!validState(ClientStates.LOGGED_IN)){
             return;
         }
         try {
@@ -198,7 +194,7 @@ public class Client {
             }
             server.joinGame(new JoinGameRequest(authToken,teamColor, String.valueOf(listedGames.get(id-1))));
             System.out.println("Successfully joined game " + id);
-            new InGameClient(new ChessGame(), ChessGame.TeamColor.WHITE);
+            new InGameClient(new ChessGame(), teamColor);
         } catch(Throwable e){
             System.out.print(SET_TEXT_COLOR_RED);
             String message = e.getMessage();
@@ -211,7 +207,7 @@ public class Client {
     }
 
     private void listGames(){
-        if(!validState(clientStates.LOGGED_IN)){
+        if(!validState(ClientStates.LOGGED_IN)){
             return;
         }
         try {
@@ -244,7 +240,7 @@ public class Client {
 
     }
 
-    public clientStates getClientState(){
+    public ClientStates getClientState(){
         return state;
     }
 
@@ -254,6 +250,6 @@ public class Client {
 
     public void setHasQuit(boolean newVal){
         hasQuit = newVal;
-        if(validState(clientStates.LOGGED_IN)) {logout();}
+        if(validState(ClientStates.LOGGED_IN)) {logout();}
     }
 }

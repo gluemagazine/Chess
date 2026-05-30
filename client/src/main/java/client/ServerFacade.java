@@ -1,6 +1,7 @@
-package server;
+package client;
 import com.google.gson.Gson;
 import model.*;
+import server.DataAccessException;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -18,7 +19,7 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public RegisterResult registerUser(RegisterRequest request) throws DataAccessException{
+    public RegisterResult registerUser(RegisterRequest request) throws DataAccessException {
         var httpRequest = buildRequest("POST","/user",request,null);
         var response = sendRequest(httpRequest);
         return handleResponse(response,RegisterResult.class);

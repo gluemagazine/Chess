@@ -4,22 +4,11 @@ import chess.ChessGame;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.DataAccessException;
-import server.Server;
-import server.ServerFacade;
 
 public class ServerFacadeTests {
 
-    private static Server server;
-    private static ServerFacade facade;
+    private final static ServerFacade facade = new ServerFacade("https://localhost:8080");
     private String goodToken;
-
-    @BeforeAll
-    public static void init() {
-        server = new Server();
-        var port = server.run(0);
-        System.out.println("Started test HTTP server on " + port);
-        facade = new ServerFacade("http://localhost:" + port);
-    }
 
     @AfterAll
     static void stopServer() {
@@ -28,7 +17,6 @@ public class ServerFacadeTests {
         } catch (DataAccessException e) {
             System.out.println("Error occurred while trying to clear the server after the tests");
         }
-        server.stop();
     }
 
     @BeforeEach
@@ -141,11 +129,11 @@ public class ServerFacadeTests {
         try {
             RegisterResult result = facade.registerUser(new RegisterRequest("ExistingUser","password","example"));
             goodToken = result.authToken();
-            facade.createGame(new CreateGameRequest(goodToken,"Game1"));
-            facade.createGame(new CreateGameRequest(goodToken,"Game2"));
+            facade.createGame(new CreateGameRequest(goodToken,"G1"));
+            facade.createGame(new CreateGameRequest(goodToken,"G2"));
             facade.joinGame(new JoinGameRequest(goodToken, ChessGame.TeamColor.WHITE,"2"));
             facade.joinGame(new JoinGameRequest(goodToken, ChessGame.TeamColor.BLACK,"2"));
-            facade.createGame(new CreateGameRequest(goodToken,"Game3"));
+            facade.createGame(new CreateGameRequest(goodToken,"G3"));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -157,19 +145,19 @@ public class ServerFacadeTests {
             throw new RuntimeException(e);
         }
 
-        Assertions.assertEquals("Game1",listResult.games().getFirst().gameName());
+        Assertions.assertEquals("G1",listResult.games().getFirst().gameName());
         Assertions.assertEquals(1,listResult.games().getFirst().gameID());
         Assertions.assertEquals(new ChessGame(),listResult.games().getFirst().game());
         Assertions.assertNull(listResult.games().getFirst().blackUsername());
         Assertions.assertNull(listResult.games().getFirst().whiteUsername());
 
-        Assertions.assertEquals("Game2",listResult.games().get(1).gameName());
+        Assertions.assertEquals("G2",listResult.games().get(1).gameName());
         Assertions.assertEquals(2,listResult.games().get(1).gameID());
         Assertions.assertEquals(new ChessGame(),listResult.games().get(1).game());
         Assertions.assertEquals("ExistingUser",listResult.games().get(1).whiteUsername());
         Assertions.assertEquals("ExistingUser",listResult.games().get(1).blackUsername());
 
-        Assertions.assertEquals("Game3",listResult.games().get(2).gameName());
+        Assertions.assertEquals("G3",listResult.games().get(2).gameName());
         Assertions.assertEquals(3,listResult.games().get(2).gameID());
         Assertions.assertEquals(new ChessGame(),listResult.games().get(2).game());
         Assertions.assertNull(listResult.games().get(2).blackUsername());
@@ -188,6 +176,7 @@ public class ServerFacadeTests {
             throw new RuntimeException(e);
         }
     }
+
     @Test
     void loginNonExistentUser(){
         Assertions.assertThrows(DataAccessException.class, ()-> facade.loginUser(new LoginRequest("ExistingUser","password")));
@@ -251,5 +240,4 @@ public class ServerFacadeTests {
         }
 
     }
-
 }

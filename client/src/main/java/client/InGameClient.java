@@ -15,7 +15,7 @@ public class InGameClient {
 
     private void printChessBoard(ChessGame game, ChessGame.TeamColor color){
         String[] letters = {"\u2003a","\u2003b","\u2003c","\u2003d","\u2003e","\u2003f","\u2003g","\u2003h"};
-        int starting_number = 8;
+        int startingNumber = 8;
         int increment = -1;
         StringBuilder topRow = new StringBuilder().append(" ");
         for(var letter: letters){
@@ -24,17 +24,17 @@ public class InGameClient {
 
         if (color == ChessGame.TeamColor.BLACK){
             topRow = topRow.reverse();
-            starting_number = 1;
+            startingNumber = 1;
             increment = 1;
         }
         System.out.println(SET_BG_COLOR_BLACK + topRow);
         for(int i = 0; i < 8; i++){
-            System.out.print(SET_BG_COLOR_BLACK + starting_number);
+            System.out.print(SET_BG_COLOR_BLACK + startingNumber);
             for(int j = 0; j < 8; j ++){
                 System.out.print(getPiece(game.getBoard(),getPosition(i,j,color)));
             }
-            System.out.println(SET_BG_COLOR_BLACK + starting_number );
-            starting_number += increment;
+            System.out.println(SET_BG_COLOR_BLACK + startingNumber  + RESET_BG_COLOR);
+            startingNumber += increment;
         }
 
 
@@ -77,7 +77,6 @@ public class InGameClient {
                 case PAWN -> BLACK_PAWN;
             };
         }
-
 
         return result;
     }
