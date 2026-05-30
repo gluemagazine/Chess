@@ -23,6 +23,11 @@ public class ServerFacadeTests {
 
     @AfterAll
     static void stopServer() {
+        try {
+            facade.clear();
+        } catch (DataAccessException e) {
+            System.out.println("Error occurred while trying to clear the server after the tests");
+        }
         server.stop();
     }
 

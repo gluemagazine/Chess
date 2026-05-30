@@ -18,7 +18,7 @@ public class Client {
 
     private boolean hasQuit = false;
 
-    private ArrayList<Integer> listedGames;
+    private final ArrayList<Integer> listedGames = new ArrayList<>();
 
     String loggedOutHelp =
             """
@@ -47,8 +47,7 @@ public class Client {
     public Client(String url){
         state = clientStates.LOGGED_OUT;
         server = new ServerFacade(url);
-
-        Repl initial = new Repl(loggedOutHelp,this);
+        new Repl(loggedOutHelp,this);
     }
 
     public void processInput(String input){
@@ -91,7 +90,6 @@ public class Client {
                     listGames();
                     break;
                 case "logout" : logout(); break;
-
                 default:
                     System.out.println(invalidCommand);
             }
@@ -104,7 +102,7 @@ public class Client {
         return desired == state;
     }
 
-    public void register (String username, String password, String email){
+    private void register (String username, String password, String email){
         if(!validState(clientStates.LOGGED_OUT)){
             return;
         }
@@ -122,7 +120,7 @@ public class Client {
         }
     }
 
-    public void login(String username, String password){
+    private void login(String username, String password){
         if(!validState(clientStates.LOGGED_OUT)){
             return;
         }
@@ -141,7 +139,7 @@ public class Client {
         }
     }
 
-    public void logout(){
+    private void logout(){
         if(!validState(clientStates.LOGGED_IN)){
             return;
         }
@@ -153,19 +151,25 @@ public class Client {
         }
     }
 
-    public void createGame(String gameName){
+    private void createGame(String gameName){
         if(!validState(clientStates.LOGGED_IN)){
             return;
         }
         try {
             CreateGameResult result = server.createGame(new CreateGameRequest(authToken,gameName));
-            System.out.println("Successfully created a game with game name " + gameName);
+            listedGames.add(Integer.valueOf(result.gameID()));
+            System.out.println("Successfully created a game with game name " + gameName + " it is game #" + (listedGames.size()));
         } catch(Throwable e){
-            System.out.println("There was an error while logging out");
+            String message = e.getMessage();
+            message = message.substring(message.indexOf("Error:"));
+            message = message.substring(7,(message.length())-2);
+
+            System.out.println(message);
+            System.out.println("There was an error while creating the game");
         }
     }
 
-    public void joinGame(int id, String color){
+    private void joinGame(int id, String color){
         if(!validState(clientStates.LOGGED_IN)){
             return;
         }
@@ -184,16 +188,45 @@ public class Client {
             server.joinGame(new JoinGameRequest(authToken,teamColor, String.valueOf(listedGames.get(id-1))));
             System.out.println("Successfully joined game " + id);
         } catch(Throwable e){
-            System.out.println("There was an error while logging out");
+            String message = e.getMessage();
+            message = message.substring(message.indexOf("Error:"));
+            message = message.substring(7,(message.length())-2);
+
+            System.out.println(message);
+            System.out.println("There was an error while joining the game");
         }
 
     }
 
-    public void listGames(){
+    private void listGames(){
         if(!validState(clientStates.LOGGED_IN)){
             return;
         }
-
+        try {
+            ListGamesResult result = server.listGames(new ListGamesRequest(authToken));
+            listedGames.clear();
+            int counter = 1;
+            for(var game : result.games()){
+                listedGames.add(game.gameID());
+                StringBuilder builder = new StringBuilder();
+                builder.append("Game #");
+                builder.append(counter);
+                builder.append(": ");
+                builder.append(game.gameName());
+                builder.append("\nWhite Player: ");
+                builder.append((game.whiteUsername() == null) ? "" :  game.whiteUsername());
+                builder.append(", Black Player: ");
+                builder.append((game.blackUsername() == null) ? "" : game.blackUsername());
+                System.out.println(builder);
+                counter++;
+            }
+        } catch(Throwable e){
+            String message = e.getMessage();
+            message = message.substring(message.indexOf("Error:"));
+            message = message.substring(7,(message.length())-2);
+            System.out.println(message);
+            System.out.println("There was an error while listing the gmaes");
+        }
 
     }
 
@@ -206,5 +239,6 @@ public class Client {
     }
     public void setHasQuit(boolean newVal){
         hasQuit = newVal;
+        if(validState(clientStates.LOGGED_IN)) {logout();}
     }
 }
