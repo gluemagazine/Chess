@@ -3,8 +3,8 @@ package dataaccess.sqldataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.daointerfaces.GameDAO;
-import dataaccess.exceptions.DataAccessException;
-import dataaccess.exceptions.DataSQLException;
+import exceptions.DataAccessException;
+import exceptions.DataSQLException;
 import model.GameData;
 
 import java.sql.*;

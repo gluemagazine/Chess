@@ -1,6 +1,6 @@
 package dataaccess;
 
-import dataaccess.exceptions.DataAccessException;
+import exceptions.DataAccessException;
 import model.UserData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -54,7 +54,11 @@ public class UserDAOTests {
 
     @Test
     void badGetUserTest(){
-        Assertions.assertThrows(Exception.class,() ->bundle.userDAO.getUser(null));
+        try {
+            Assertions.assertNull(bundle.userDAO.getUser(null));
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

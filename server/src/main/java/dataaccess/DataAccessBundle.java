@@ -4,7 +4,7 @@ package dataaccess;
 import dataaccess.daointerfaces.AuthDAO;
 import dataaccess.daointerfaces.GameDAO;
 import dataaccess.daointerfaces.UserDAO;
-import dataaccess.exceptions.DataAccessException;
+import exceptions.DataAccessException;
 import dataaccess.memorydaos.MemoryAuthDAO;
 import dataaccess.memorydaos.MemoryGameDAO;
 import dataaccess.memorydaos.MemoryUserDAO;

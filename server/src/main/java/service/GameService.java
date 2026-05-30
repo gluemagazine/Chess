@@ -4,7 +4,7 @@ import chess.ChessGame;
 import dataaccess.daointerfaces.AuthDAO;
 import dataaccess.daointerfaces.GameDAO;
 import dataaccess.daointerfaces.UserDAO;
-import dataaccess.exceptions.*;
+import exceptions.*;
 import model.*;
 
 

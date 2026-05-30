@@ -3,10 +3,7 @@ package service;
 
 import dataaccess.daointerfaces.AuthDAO;
 import dataaccess.daointerfaces.UserDAO;
-import dataaccess.exceptions.AlreadyTakenException;
-import dataaccess.exceptions.BadCredentialsException;
-import dataaccess.exceptions.DataAccessException;
-import dataaccess.exceptions.InvalidAuthException;
+import exceptions.*;
 import model.*;
 import org.mindrot.jbcrypt.BCrypt;
 

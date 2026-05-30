@@ -4,7 +4,7 @@ import dataaccess.*;
 import dataaccess.daointerfaces.AuthDAO;
 import dataaccess.daointerfaces.GameDAO;
 import dataaccess.daointerfaces.UserDAO;
-import dataaccess.exceptions.DataAccessException;
+import exceptions.DataAccessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

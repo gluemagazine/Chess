@@ -1,10 +1,7 @@
 package server.handlers;
 
 import com.google.gson.Gson;
-import dataaccess.exceptions.DataAccessException;
-import dataaccess.exceptions.DataSQLException;
-import dataaccess.exceptions.InvalidAuthException;
-import dataaccess.exceptions.InvalidGameNameException;
+import exceptions.*;
 import io.javalin.http.Context;
 import model.CreateGameRequest;
 import model.CreateGameResult;

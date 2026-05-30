@@ -1,8 +1,8 @@
 package server.handlers;
 
 import com.google.gson.Gson;
-import dataaccess.exceptions.DataAccessException;
-import dataaccess.exceptions.DataSQLException;
+import exceptions.DataAccessException;
+import exceptions.DataSQLException;
 import io.javalin.http.Context;
 import org.jetbrains.annotations.NotNull;
 import service.DataService;

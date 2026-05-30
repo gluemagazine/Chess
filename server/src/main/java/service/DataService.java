@@ -1,7 +1,7 @@
 package service;
 
 import dataaccess.daointerfaces.AuthDAO;
-import dataaccess.exceptions.DataAccessException;
+import exceptions.DataAccessException;
 import dataaccess.daointerfaces.GameDAO;
 import dataaccess.daointerfaces.UserDAO;
 
