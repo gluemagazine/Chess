@@ -3,7 +3,7 @@ package client;
 import chess.ChessGame;
 import model.*;
 import org.junit.jupiter.api.*;
-import server.DataAccessException;
+import exceptions.*;
 import server.Server;
 
 public class ServerFacadeTests {
@@ -18,7 +18,7 @@ public class ServerFacadeTests {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
-        facade = new ServerFacade("https://localhost:" + port);
+        facade = new ServerFacade("http://localhost:" + port);
     }
 
     @AfterAll
