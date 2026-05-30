@@ -4,7 +4,10 @@ import chess.ChessGame;
 import model.*;
 import server.ServerFacade;
 
-import ui.EscapeSequences.*;
+import ui.EscapeSequences;
+
+import chess.ChessGame;
+import static ui.EscapeSequences.*;
 
 import java.util.ArrayList;
 
@@ -21,7 +24,7 @@ public class Client {
     private final ArrayList<Integer> listedGames = new ArrayList<>();
 
     String loggedOutHelp =
-            """
+            """ 
             register <Username> <Password> <Email> - Creates a new account
             login <Username> <Password> - Log in as an existing user
             quit - playing chess
@@ -37,7 +40,7 @@ public class Client {
             quit - playing chess
             help - display all current valid commands""";
 
-    String invalidCommand = "Invalid command or arguments, type \"help\" to get a list of valid commands and parameters.";
+    String invalidCommand = SET_TEXT_COLOR_RED + "Invalid command or arguments, type \"help\" to get a list of valid commands and parameters.";
 
 
     private clientStates state;
@@ -115,6 +118,8 @@ public class Client {
                 new Repl(loggedInHelp,this);
             }
         } catch(Throwable e){
+            System.out.print(SET_TEXT_COLOR_RED);
+
             System.out.println("There was an error while registering, make sure" +
                     " to provide a valid username, password, and email address.");
         }
@@ -133,6 +138,8 @@ public class Client {
                 new Repl(loggedInHelp,this);
             }
         } catch(Throwable e){
+            System.out.print(SET_TEXT_COLOR_RED);
+
             System.out.println("There was an error while logging in, make sure" +
                     " to provide a valid username and password.\n" +
                     "If you have not yet registered, please do so");
@@ -147,6 +154,8 @@ public class Client {
             server.logout(new LogoutRequest(authToken));
             state = clientStates.LOGGED_OUT;
         } catch(Throwable e){
+            System.out.print(SET_TEXT_COLOR_RED);
+
             System.out.println("There was an error while logging out");
         }
     }
@@ -160,6 +169,8 @@ public class Client {
             listedGames.add(Integer.valueOf(result.gameID()));
             System.out.println("Successfully created a game with game name " + gameName + " it is game #" + (listedGames.size()));
         } catch(Throwable e){
+            System.out.print(SET_TEXT_COLOR_RED);
+
             String message = e.getMessage();
             message = message.substring(message.indexOf("Error:"));
             message = message.substring(7,(message.length())-2);
@@ -187,7 +198,9 @@ public class Client {
             }
             server.joinGame(new JoinGameRequest(authToken,teamColor, String.valueOf(listedGames.get(id-1))));
             System.out.println("Successfully joined game " + id);
+            new InGameClient(new ChessGame(), ChessGame.TeamColor.WHITE);
         } catch(Throwable e){
+            System.out.print(SET_TEXT_COLOR_RED);
             String message = e.getMessage();
             message = message.substring(message.indexOf("Error:"));
             message = message.substring(7,(message.length())-2);
@@ -220,6 +233,8 @@ public class Client {
                 counter++;
             }
         } catch(Throwable e){
+            System.out.print(SET_TEXT_COLOR_RED);
+
             String message = e.getMessage();
             message = message.substring(message.indexOf("Error:"));
             message = message.substring(7,(message.length())-2);

@@ -3,7 +3,7 @@ package client;
 
 import java.util.Scanner;
 
-import ui.EscapeSequences.*;
+import static ui.EscapeSequences.*;
 
 public class Repl {
 
@@ -23,6 +23,8 @@ public class Repl {
             if(client.getHasQuit()){
                 break;
             }
+            System.out.print(RESET_TEXT_COLOR);
+
 
             System.out.print("[" + client.getClientState() + "] >>> " );
             String input = scanner.nextLine();
@@ -33,11 +35,19 @@ public class Repl {
             }
 
             if(input.equals("help")){
-                System.out.println(help);
+                printAlternating(help);
                 continue;
             }
 
             client.processInput(input);
+        }
+    }
+
+    private void printAlternating(String toPrint){
+        String[] split = toPrint.split("\n");
+        for(var line : split){
+            var pieces = line.split( "-");
+            System.out.println(pieces[0] + SET_TEXT_COLOR_LIGHT_GREY + "-" + pieces[1] + RESET_TEXT_COLOR);
         }
     }
 }
