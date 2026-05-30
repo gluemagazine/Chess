@@ -195,7 +195,6 @@ public class Client {
             System.out.println(message);
             System.out.println("There was an error while joining the game");
         }
-
     }
 
     private void listGames(){
@@ -225,7 +224,7 @@ public class Client {
             message = message.substring(message.indexOf("Error:"));
             message = message.substring(7,(message.length())-2);
             System.out.println(message);
-            System.out.println("There was an error while listing the gmaes");
+            System.out.println("There was an error while listing the games");
         }
 
     }
@@ -237,6 +236,7 @@ public class Client {
     public boolean getHasQuit(){
         return hasQuit;
     }
+
     public void setHasQuit(boolean newVal){
         hasQuit = newVal;
         if(validState(clientStates.LOGGED_IN)) {logout();}
