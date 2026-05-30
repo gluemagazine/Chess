@@ -4,22 +4,30 @@ import chess.ChessGame;
 import model.*;
 import org.junit.jupiter.api.*;
 import server.DataAccessException;
+import server.Server;
 
 public class ServerFacadeTests {
 
-    private final static ServerFacade facade = new ServerFacade("https://localhost:8080");
+    private static ServerFacade facade ;
     private String goodToken;
+
+    private static Server server;
+
+    @BeforeAll
+    public static void init() {
+        server = new Server();
+        var port = server.run(0);
+        System.out.println("Started test HTTP server on " + port);
+        facade = new ServerFacade("https://localhost:" + port);
+    }
 
     @AfterAll
     static void stopServer() {
-        try {
-            facade.clear();
-        } catch (DataAccessException e) {
-            System.out.println("Error occurred while trying to clear the server after the tests");
-        }
+        server.stop();
     }
 
     @BeforeEach
+    @AfterEach
     void clearServices(){
         try {
             facade.clear();
