@@ -1,9 +1,12 @@
 package client;
 
+import chess.ChessGame;
 import model.*;
 import server.ServerFacade;
 
 import ui.EscapeSequences.*;
+
+import java.util.ArrayList;
 
 public class Client {
 
@@ -14,6 +17,8 @@ public class Client {
     }
 
     private boolean hasQuit = false;
+
+    private ArrayList<Integer> listedGames;
 
     String loggedOutHelp =
             """
@@ -49,7 +54,7 @@ public class Client {
     public void processInput(String input){
         String[] params = input.split(" ");
         try {
-            switch (params[0]){
+            switch (params[0].toLowerCase()){
                 case "login" :
                     if ((params.length == 3)) {
                         login(params[1], params[2]);
@@ -64,8 +69,31 @@ public class Client {
                         System.out.println("Not enough or too many arguments given to successfully register");
                     }
                     break;
-                case "logout" : logout();
+                case "create" :
+                    if ((params.length == 2)) {
+                        createGame(params[1]);
+                    } else {
+                        System.out.println("Not enough or too many arguments given to create a game");
+                    }
+                    break;
+                case "join" :
+                    if ((params.length == 3)) {
+                        joinGame(Integer.parseInt(params[1]),params[2]);
+                    } else {
+                        System.out.println("Not enough or too many arguments given to create a game");
+                    }
+                    break;
+                case "list" :
+                    if ((params.length != 1)) {
+                        System.out.println("No parameters needed for list games");
+                        break;
+                    }
+                    listGames();
+                    break;
+                case "logout" : logout(); break;
 
+                default:
+                    System.out.println(invalidCommand);
             }
         } catch (Throwable e){
             System.out.println(invalidCommand);
@@ -123,6 +151,50 @@ public class Client {
         } catch(Throwable e){
             System.out.println("There was an error while logging out");
         }
+    }
+
+    public void createGame(String gameName){
+        if(!validState(clientStates.LOGGED_IN)){
+            return;
+        }
+        try {
+            CreateGameResult result = server.createGame(new CreateGameRequest(authToken,gameName));
+            System.out.println("Successfully created a game with game name " + gameName);
+        } catch(Throwable e){
+            System.out.println("There was an error while logging out");
+        }
+    }
+
+    public void joinGame(int id, String color){
+        if(!validState(clientStates.LOGGED_IN)){
+            return;
+        }
+        try {
+            ChessGame.TeamColor teamColor;
+            if(color.equalsIgnoreCase("WHITE")){
+                teamColor = ChessGame.TeamColor.WHITE;
+            }
+            else if(color.equalsIgnoreCase("BLACK")){
+                teamColor = ChessGame.TeamColor.BLACK;
+            }
+            else {
+                System.out.println("Invalid team color, make sure the arguments are in the right order");
+                return;
+            }
+            server.joinGame(new JoinGameRequest(authToken,teamColor, String.valueOf(listedGames.get(id-1))));
+            System.out.println("Successfully joined game " + id);
+        } catch(Throwable e){
+            System.out.println("There was an error while logging out");
+        }
+
+    }
+
+    public void listGames(){
+        if(!validState(clientStates.LOGGED_IN)){
+            return;
+        }
+
+
     }
 
     public clientStates getClientState(){
