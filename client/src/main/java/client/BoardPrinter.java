@@ -20,14 +20,6 @@ public class BoardPrinter {
         System.out.println(SET_BG_COLOR_BLACK + topRow + RESET_BG_COLOR);
     }
 
-    private ChessPosition getPosition(int i, int j, ChessGame.TeamColor color){
-        if(color == ChessGame.TeamColor.WHITE){
-            return new ChessPosition(i+1,j+1);
-        }
-        return new ChessPosition(8-i,8-j);
-    }
-
-
     private String getPiece(ChessBoard board, ChessPosition position){
         ChessPiece piece = board.getPiece(position);
         if(piece == null){
