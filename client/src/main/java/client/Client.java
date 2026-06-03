@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessGame;
+import exceptions.DataAccessException;
 import model.*;
 
 import static ui.EscapeSequences.*;
@@ -16,6 +17,7 @@ public class Client {
     }
 
     private boolean hasQuit = false;
+    private boolean breakLoop = false;
 
     private final ArrayList<Integer> listedGames = new ArrayList<>();
 
@@ -57,38 +59,57 @@ public class Client {
                     if ((params.length == 3)) {
                         login(params[1], params[2]);
                     } else {
-                        System.out.println("Not enough or too many arguments given to successfully login");
+                        System.out.println(SET_TEXT_COLOR_RED + "Not enough or too many arguments given to successfully login");
                     }
                     break;
                 case "register" :
                     if ((params.length == 4)) {
                         register(params[1], params[2], params[3]);
                     } else {
-                        System.out.println("Not enough or too many arguments given to successfully register");
+                        System.out.println(SET_TEXT_COLOR_RED + "Not enough or too many arguments given to successfully register");
                     }
                     break;
                 case "create" :
                     if ((params.length == 2)) {
                         createGame(params[1]);
                     } else {
-                        System.out.println("Not enough or too many arguments given to create a game");
+                        System.out.println(SET_TEXT_COLOR_RED + "Not enough or too many arguments given to create a game");
                     }
                     break;
                 case "join" :
                     if ((params.length == 3)) {
                         joinGame(Integer.parseInt(params[1]),params[2]);
                     } else {
-                        System.out.println("Not enough or too many arguments given to create a game");
+                        System.out.println(SET_TEXT_COLOR_RED + "Not enough or too many arguments given to create a game");
                     }
                     break;
                 case "list" :
                     if ((params.length != 1)) {
-                        System.out.println("No parameters needed for list games");
+                        System.out.println(SET_TEXT_COLOR_YELLOW + "No parameters needed for list games");
                         break;
                     }
                     listGames();
                     break;
-                case "logout" : logout(); break;
+                case "logout" :
+                    if ((params.length != 1)) {
+                        System.out.println(SET_TEXT_COLOR_YELLOW + "No parameters needed for logout");
+                        break;
+                    }
+                    logout();
+                    break;
+                case "quit":
+                    if ((params.length != 1)) {
+                        System.out.println(SET_TEXT_COLOR_YELLOW + "No parameters needed for quit");
+                        break;
+                    }
+                    setHasQuit(true);
+                    break;
+                case "help":
+                    if ((params.length != 1)) {
+                        System.out.println(SET_TEXT_COLOR_YELLOW + "No parameters needed for help");
+                        break;
+                    }
+                    break;
                 default:
                     System.out.println(invalidCommand);
             }
@@ -103,6 +124,7 @@ public class Client {
 
     private void register (String username, String password, String email){
         if(!validState(ClientStates.LOGGED_OUT)){
+            System.out.println(invalidCommand);
             return;
         }
         try {
@@ -116,13 +138,20 @@ public class Client {
         } catch(Throwable e){
             System.out.print(SET_TEXT_COLOR_RED);
 
-            System.out.println("There was an error while registering, make sure" +
-                    " to provide a valid username, password, and email address.");
+            if(e.getClass() == DataAccessException.class){
+                System.out.println("Response from server: " + sliceOutMessage(e.getMessage()));
+            } else {
+                System.out.println("There was an error while registering, make sure" +
+                        " to provide a valid username, password, and email address.");
+            }
+
+
         }
     }
 
     private void login(String username, String password){
         if(!validState(ClientStates.LOGGED_OUT)){
+            System.out.println(invalidCommand);
             return;
         }
         try {
@@ -135,29 +164,39 @@ public class Client {
             }
         } catch(Throwable e){
             System.out.print(SET_TEXT_COLOR_RED);
-
-            System.out.println("There was an error while logging in, make sure" +
-                    " to provide a valid username and password.\n" +
-                    "If you have not yet registered, please do so");
+            if(e.getClass() == DataAccessException.class){
+                System.out.println("Response from server: " + sliceOutMessage(e.getMessage()));
+            } else {
+                System.out.println("There was an error while logging in, make sure" +
+                        " to provide a valid username and password.\n" +
+                        "If you have not yet registered, please do so");
+            }
         }
     }
 
     private void logout(){
         if(!validState(ClientStates.LOGGED_IN)){
+            System.out.println(invalidCommand);
             return;
         }
         try {
             server.logout(new LogoutRequest(authToken));
             state = ClientStates.LOGGED_OUT;
+            breakLoop = true;
         } catch(Throwable e){
             System.out.print(SET_TEXT_COLOR_RED);
 
-            System.out.println("There was an error while logging out");
+            if(e.getClass() == DataAccessException.class){
+                System.out.println("Response from server: " + sliceOutMessage(e.getMessage()));
+            } else {
+                System.out.println("There was an error while logging out");
+            }
         }
     }
 
     private void createGame(String gameName){
         if(!validState(ClientStates.LOGGED_IN)){
+            System.out.println(invalidCommand);
             return;
         }
         try {
@@ -167,17 +206,19 @@ public class Client {
         } catch(Throwable e){
             System.out.print(SET_TEXT_COLOR_RED);
 
-            String message = e.getMessage();
-            message = message.substring(message.indexOf("Error:"));
-            message = message.substring(7,(message.length())-2);
+            if(e.getClass() == DataAccessException.class){
+                System.out.println("Response from server: " + sliceOutMessage(e.getMessage()));
+            } else {
+                System.out.println("There was an error while creating the game");
+            }
 
-            System.out.println(message);
             System.out.println("There was an error while creating the game");
         }
     }
 
     private void joinGame(int id, String color){
         if(!validState(ClientStates.LOGGED_IN)){
+            System.out.println(invalidCommand);
             return;
         }
         try {
@@ -189,7 +230,7 @@ public class Client {
                 teamColor = ChessGame.TeamColor.BLACK;
             }
             else {
-                System.out.println("Invalid team color, make sure the arguments are in the right order");
+                System.out.println(SET_TEXT_COLOR_RED + "Invalid team color, make sure the arguments are in the right order");
                 return;
             }
             server.joinGame(new JoinGameRequest(authToken,teamColor, String.valueOf(listedGames.get(id-1))));
@@ -197,17 +238,18 @@ public class Client {
             new InGameClient(new ChessGame(), teamColor);
         } catch(Throwable e){
             System.out.print(SET_TEXT_COLOR_RED);
-            String message = e.getMessage();
-            message = message.substring(message.indexOf("Error:"));
-            message = message.substring(7,(message.length())-2);
 
-            System.out.println(message);
-            System.out.println("There was an error while joining the game");
+            if(e.getClass() == DataAccessException.class){
+                System.out.println("Response from server: " + sliceOutMessage(e.getMessage()));
+            } else {
+                System.out.println("There was an error while joining the game");
+            }
         }
     }
 
     private void listGames(){
         if(!validState(ClientStates.LOGGED_IN)){
+            System.out.println(invalidCommand);
             return;
         }
         try {
@@ -231,17 +273,23 @@ public class Client {
         } catch(Throwable e){
             System.out.print(SET_TEXT_COLOR_RED);
 
-            String message = e.getMessage();
-            message = message.substring(message.indexOf("Error:"));
-            message = message.substring(7,(message.length())-2);
-            System.out.println(message);
-            System.out.println("There was an error while listing the games");
+            if(e.getClass() == DataAccessException.class){
+                System.out.println("Response from server: " + sliceOutMessage(e.getMessage()));
+            } else {
+                System.out.println("There was an error while listing the games");
+            }
         }
 
     }
 
     public ClientStates getClientState(){
         return state;
+    }
+
+    private String sliceOutMessage(String message){
+        message = message.substring(message.indexOf("Error:"));
+        message = message.substring(7,(message.length())-2);
+        return message;
     }
 
     public boolean getHasQuit(){
@@ -251,5 +299,13 @@ public class Client {
     public void setHasQuit(boolean newVal){
         hasQuit = newVal;
         if(validState(ClientStates.LOGGED_IN)) {logout();}
+    }
+
+    public boolean getBreakLoop(){
+        return breakLoop;
+    }
+
+    public void setBreakLoop (boolean val){
+        breakLoop = val;
     }
 }

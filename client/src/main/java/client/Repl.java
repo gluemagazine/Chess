@@ -23,6 +23,10 @@ public class Repl {
             if(client.getHasQuit()){
                 break;
             }
+            if(client.getBreakLoop()){
+                client.setBreakLoop(false);
+                break;
+            }
             System.out.print(RESET_TEXT_COLOR);
 
 

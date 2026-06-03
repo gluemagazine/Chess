@@ -9,32 +9,24 @@ import static ui.EscapeSequences.*;
 
 public class InGameClient {
 
+    static void main(String[] args){
+        new InGameClient(new ChessGame(), ChessGame.TeamColor.BLACK);
+        System.out.println();
+        new InGameClient(new ChessGame(), ChessGame.TeamColor.WHITE);
+    }
+
     public InGameClient(ChessGame game, ChessGame.TeamColor color){
         printChessBoard(game,color);
     }
 
     private void printChessBoard(ChessGame game, ChessGame.TeamColor color){
-        String[] letters = {"\u2003a","\u2003b","\u2003c","\u2003d","\u2003e","\u2003f","\u2003g","\u2003h"};
-        int startingNumber = 8;
-        int increment = -1;
-        StringBuilder topRow = new StringBuilder().append(" ");
-        for(var letter: letters){
-            topRow.append(letter).append(" ");
-        }
+        String[] letters = {"a","b","c","d","e","f","g","h"};
+        String topRow = buildRow(letters,"\u2003 ","\u2003\u2003",color == ChessGame.TeamColor.BLACK) + " ";
 
-        if (color == ChessGame.TeamColor.BLACK){
-            topRow = topRow.reverse();
-            startingNumber = 1;
-            increment = 1;
-        }
-        System.out.println(SET_BG_COLOR_BLACK + topRow);
+
+        System.out.println(SET_BG_COLOR_BLACK + topRow + RESET_BG_COLOR);
         for(int i = 0; i < 8; i++){
-            System.out.print(SET_BG_COLOR_BLACK + startingNumber);
-            for(int j = 0; j < 8; j ++){
-                System.out.print(getPiece(game.getBoard(),getPosition(i,j,color)));
-            }
-            System.out.println(SET_BG_COLOR_BLACK + startingNumber  + RESET_BG_COLOR);
-            startingNumber += increment;
+            System.out.println(buildColoredRow(i,game,color));
         }
 
 
@@ -60,24 +52,54 @@ public class InGameClient {
 
         if(piece.getTeamColor() == ChessGame.TeamColor.WHITE){
             result = switch(piece.getPieceType()){
-                case KING -> WHITE_KING;
-                case QUEEN -> WHITE_QUEEN;
-                case BISHOP -> WHITE_BISHOP;
-                case KNIGHT -> WHITE_KNIGHT;
-                case ROOK -> WHITE_ROOK;
-                case PAWN -> WHITE_PAWN;
+                case KING -> SET_TEXT_COLOR_BLACK + WHITE_KING;
+                case QUEEN -> SET_TEXT_COLOR_BLACK + WHITE_QUEEN;
+                case BISHOP -> SET_TEXT_COLOR_BLACK + WHITE_BISHOP;
+                case KNIGHT -> SET_TEXT_COLOR_BLACK + WHITE_KNIGHT;
+                case ROOK -> SET_TEXT_COLOR_BLACK + WHITE_ROOK;
+                case PAWN -> SET_TEXT_COLOR_BLACK + WHITE_PAWN;
             };
         } else if(piece.getTeamColor() == ChessGame.TeamColor.BLACK){
             result = switch(piece.getPieceType()){
-                case KING -> BLACK_KING;
-                case QUEEN -> BLACK_QUEEN;
-                case BISHOP -> BLACK_BISHOP;
-                case KNIGHT -> BLACK_KNIGHT;
-                case ROOK -> BLACK_ROOK;
-                case PAWN -> BLACK_PAWN;
+                case KING -> SET_TEXT_COLOR_BLACK + BLACK_KING;
+                case QUEEN -> SET_TEXT_COLOR_BLACK + BLACK_QUEEN;
+                case BISHOP -> SET_TEXT_COLOR_BLACK + BLACK_BISHOP;
+                case KNIGHT -> SET_TEXT_COLOR_BLACK + BLACK_KNIGHT;
+                case ROOK -> SET_TEXT_COLOR_BLACK + BLACK_ROOK;
+                case PAWN -> SET_TEXT_COLOR_BLACK + BLACK_PAWN;
             };
         }
 
         return result;
+    }
+
+    private String buildRow(String[] items, String inBetween, String ends, boolean reversed){
+        StringBuilder builder = new StringBuilder();
+        builder.append(ends);
+        builder.append(items[0]);
+        for(int i = 1; i < items.length; i ++){
+            builder.append(inBetween);
+            builder.append(items[i]);
+        }
+        builder.append(ends);
+        return (reversed) ? builder.toString() : builder.reverse().toString();
+    }
+
+    private String buildColoredRow(int row,ChessGame game,ChessGame.TeamColor color){
+        String bgColor = (row % 2 == 0) ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLUE ;
+        StringBuilder builder = new StringBuilder();
+        int realRow = (color == ChessGame.TeamColor.WHITE) ? row : 7-row;
+
+        builder.append(SET_BG_COLOR_BLACK).append(realRow + 1).append(" ");
+        for(int i = 0; i < 8; i ++){
+            int realCol = (color == ChessGame.TeamColor.WHITE) ? i : 7-i;
+            String piece = getPiece(game.getBoard(),getPosition(row,i,color));
+            builder.append(bgColor);
+            bgColor = (bgColor.equals(SET_BG_COLOR_BLUE)) ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLUE;
+            builder.append(piece);
+        }
+        builder.append(RESET_TEXT_COLOR).append(SET_BG_COLOR_BLACK).append(" ").append(realRow + 1).append(" ").append(RESET_BG_COLOR);
+        return builder.toString();
+
     }
 }
