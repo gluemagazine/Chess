@@ -78,9 +78,23 @@ public class Client {
                     break;
                 case "join" :
                     if ((params.length == 3)) {
-                        joinGame(Integer.parseInt(params[1]),params[2]);
+                        if(validID(params[1])){
+                            joinGame(Integer.parseInt(params[1]),params[2]);
+                        }
                     } else {
-                        System.out.println(SET_TEXT_COLOR_RED + "Not enough or too many arguments given to create a game");
+                        System.out.println(SET_TEXT_COLOR_RED + "Not enough or too many arguments given to join a game");
+                    }
+                    break;
+                case "observe" :
+                    if ((params.length == 2)) {
+                        if(validID(params[1])){
+                            observeGame(Integer.parseInt(params[1]));
+                        }
+                        else {
+                            System.out.println(SET_TEXT_COLOR_RED + "Please provide a valid game ID");
+                        }
+                    } else {
+                        System.out.println(SET_TEXT_COLOR_RED + "Not enough or too many arguments given to observe a game");
                     }
                     break;
                 case "list" :
@@ -255,8 +269,9 @@ public class Client {
         try {
             ListGamesResult result = server.listGames(new ListGamesRequest(authToken));
             listedGames.clear();
-            int counter = 1;
+            int counter = 0;
             for(var game : result.games()){
+                counter++;
                 listedGames.add(game.gameID());
                 StringBuilder builder = new StringBuilder();
                 builder.append("Game #");
@@ -268,7 +283,9 @@ public class Client {
                 builder.append(", Black Player: ");
                 builder.append((game.blackUsername() == null) ? "" : game.blackUsername());
                 System.out.println(builder);
-                counter++;
+            }
+            if(counter == 0){
+                System.out.println(SET_TEXT_COLOR_YELLOW + "There are no games to list");
             }
         } catch(Throwable e){
             System.out.print(SET_TEXT_COLOR_RED);
@@ -280,6 +297,21 @@ public class Client {
             }
         }
 
+    }
+
+    private boolean validID(String string){
+        int num;
+        try {
+            num = Integer.parseInt(string);
+        } catch (Throwable e){
+            System.out.println(SET_TEXT_COLOR_RED + "Please provide a valid game ID");
+            return false;
+        }
+        return (num > 0 && num <= listedGames.size());
+    }
+
+    private void observeGame(int id){
+        new InGameClient(new ChessGame(), ChessGame.TeamColor.WHITE);
     }
 
     public ClientStates getClientState(){

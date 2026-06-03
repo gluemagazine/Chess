@@ -60,7 +60,7 @@ public class BoardPrinter {
             builder.append(items[i]);
         }
         builder.append(ends);
-        return (reversed) ? builder.toString() : builder.reverse().toString();
+        return (reversed) ? builder.reverse().toString() : builder.toString();
     }
 
     private String buildColoredRow(int row,ChessGame game,ChessGame.TeamColor color){
