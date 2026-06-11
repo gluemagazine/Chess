@@ -92,6 +92,12 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
 
+        String target = (game.getTeamTurn() == ChessGame.TeamColor.WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
+        if(!authData.username().equals(target)){
+            respond(session, new ErrorMessage("Error: it is not your turn!"));
+            return;
+        }
+
         NotificationMessage msg = null;
         try {
             game.makeMove(move);
@@ -116,6 +122,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
         updateGames(gameID,gameData.game());
+        String moveString;
+        String startPosition = move.getStartPosition().getLetterMove();
+        String endPosition = move.getEndPosition().getLetterMove();
+
+        if(move.getPromotionPiece() != null){
+            moveString = authData.username() + " made the move " + startPosition + " to "
+                    + endPosition  + " " + move.getPromotionPiece();
+        }
+        else {
+            moveString = authData.username() + " made the move " + startPosition + " to " + endPosition;
+        }
+
+        NotificationMessage moveNotice = new NotificationMessage(moveString);
+        connections.broadcast(gameID,session,moveNotice);
         if(msg != null){
             connections.broadcast(gameID,null,msg);
         }
