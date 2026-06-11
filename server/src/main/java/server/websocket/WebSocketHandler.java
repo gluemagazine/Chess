@@ -149,6 +149,29 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             respond(session,new ErrorMessage("Error: unauthorized"));
             return;
         }
+
+        GameData gameData = getGameData(gameID);
+        if(gameData == null){
+            respond(session, new ErrorMessage("Error: invalid game ID"));
+            return;
+        }
+        try {
+            if(Objects.equals(gameData.whiteUsername(), data.username())){
+                bundle.gameDAO.updateGame(String.valueOf(gameID),gameData.changeWhite(null));
+            }
+            if(Objects.equals(gameData.blackUsername(), data.username())){
+                bundle.gameDAO.updateGame(String.valueOf(gameID),gameData.changeBlack(null));
+            }
+        } catch (DataAccessException e) {
+            throw new IOException(e);
+        }
+
+
+        connections.removeFromGame(gameID,session);
+
+        NotificationMessage message = new NotificationMessage(data.username() + " has left the game");
+
+        connections.broadcast(gameID,session, message);
     }
 
     private void resign(int gameID, String authToken, Session session) throws IOException{
