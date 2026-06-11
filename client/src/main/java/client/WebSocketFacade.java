@@ -10,13 +10,11 @@ import java.net.URISyntaxException;
 
 public class WebSocketFacade extends Endpoint{
 
-    private final ServerMessageObserver observer;
     private Session session;
     public WebSocketFacade(String url,ServerMessageObserver observer) throws Exception {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
-            this.observer = observer;
 
             WebSocketContainer container = ContainerProvider.getWebSocketContainer();
             this.session = container.connectToServer(this, socketURI);
@@ -44,13 +42,7 @@ public class WebSocketFacade extends Endpoint{
 
     }
 
-    public boolean connect(int gameID, String authToken){
-        UserGameCommand action = new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken,gameID);
-        try {
-            this.session.getBasicRemote().sendText(new Gson().toJson(action));
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
+    public void sendCommand(UserGameCommand command) {
+        this.session.getAsyncRemote().sendText(new Gson().toJson(command));
     }
 }
