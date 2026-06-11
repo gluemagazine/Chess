@@ -19,6 +19,7 @@ public class ChessGame {
     private ChessPosition blackKing;
     final private HashSet<ChessPosition> blackCastles;
     final private HashSet<ChessPosition> whiteCastles;
+    private boolean gameOver = false;
 
 
     public ChessGame() {
@@ -49,6 +50,9 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
+        if(gameOver){
+            return;
+        }
         turn = team;
         if (team == TeamColor.BLACK){
             board.setWhiteEnPasant(new ChessPosition(-1,-1));
@@ -120,7 +124,7 @@ public class ChessGame {
         return !(newThreats.containsKey(mustProtect));
     }
 
-    public ChessBoard makeBoardFromMove(ChessMove move){
+    private ChessBoard makeBoardFromMove(ChessMove move){
 
         ChessBoard copy;
         copy = board.clone();
@@ -194,6 +198,9 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if(gameOver){
+            return;
+        }
         ChessBoard prev = new ChessBoard();
         for (int i = 0; i < 8; i++){
             for(int j = 0; j < 9; j++){
@@ -402,6 +409,14 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    public void setGameOver(boolean val){
+        gameOver = val;
+    }
+
+    public boolean getGameOver(){
+        return gameOver;
     }
 
     @Override

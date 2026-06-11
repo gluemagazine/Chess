@@ -3,6 +3,7 @@ package server.websocket;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.DataAccessBundle;
 import exceptions.DataAccessException;
@@ -10,12 +11,15 @@ import io.javalin.websocket.*;
 import model.*;
 import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
+import websocket.commands.UserJoinGameCommand;
 import websocket.commands.UserMakeMoveCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsCloseHandler {
 
@@ -38,13 +42,16 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             UserGameCommand command = new Gson().fromJson(ctx.message(), UserGameCommand.class);
             if(command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE){
                 UserMakeMoveCommand newCommand = new Gson().fromJson(ctx.message(), UserMakeMoveCommand.class);
-                makeMove(newCommand.getGameID(), newCommand.getMove(), newCommand.getAuthToken() ,ctx.session);
+                makeMove(newCommand.getGameID(), newCommand.getMove(), newCommand.getColor(), newCommand.getAuthToken() ,ctx.session);
+            }
+            else if(command.getCommandType() == UserGameCommand.CommandType.CONNECT){
+                UserJoinGameCommand newCommand = new Gson().fromJson(ctx.message(), UserJoinGameCommand.class);
+                connect(newCommand.getGameID(), newCommand.getAuthToken(), newCommand.getColor() ,ctx.session);
             }
             else {
                 switch (command.getCommandType()) {
                     case LEAVE -> leave(command.getGameID(),command.getAuthToken(),ctx.session);
                     case RESIGN -> resign(command.getGameID(),command.getAuthToken(),ctx.session);
-                    case CONNECT -> connect(command.getGameID(),command.getAuthToken(),ctx.session);
                 }
             }
 
@@ -58,16 +65,60 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void makeMove(int gameID, ChessMove move, String authToken, Session session) throws IOException{
+    private void makeMove(int gameID, ChessMove move, ChessGame.TeamColor color, String authToken, Session session) throws IOException{
         System.out.println("This is a makeMove command");
 
-        AuthData data = validateAndGetUser(authToken);
-        if(data == null){
+        AuthData authData = validateAndGetUser(authToken);
+        if(authData == null){
             respond(session,new ErrorMessage("Error: unauthorized"));
             return;
         }
 
-        respond(session, new ServerMessage(ServerMessage.ServerMessageType.ERROR));
+        GameData gameData = getGameData(gameID);
+        if(gameData == null){
+            respond(session, new ErrorMessage("Error: invalid game ID"));
+            return;
+        }
+
+        if(!canAct(gameData,authData)){
+            respond(session, new ErrorMessage("Error: observers can't act!"));
+            return;
+        }
+
+        ChessGame game = gameData.game();
+
+        if(game.getGameOver()){
+            respond(session, new ErrorMessage("Error: this game is over!"));
+            return;
+        }
+
+        NotificationMessage msg = null;
+        try {
+            game.makeMove(move);
+            if(game.isInCheckmate(game.getTeamTurn())){
+                game.setGameOver(true);
+                msg = new NotificationMessage(game.getTeamTurn() + " is in checkmate");
+            } else if(game.isInCheck(game.getTeamTurn())){
+                game.setGameOver(true);
+                msg = new NotificationMessage(game.getTeamTurn() + " is in check");
+            } else if(game.isInStalemate(game.getTeamTurn())){
+                game.setGameOver(true);
+                msg = new NotificationMessage(game.getTeamTurn() + " is in a stalemate");
+            }
+            bundle.gameDAO.updateGame(String.valueOf(gameID),gameData.updateGame(game));
+        } catch (InvalidMoveException e) {
+            System.out.println(game);
+            System.out.println(move);
+            respond(session, new ErrorMessage("Error: invalid move!"));
+            return;
+        } catch (DataAccessException ex){
+            respond(session, new ErrorMessage("Error: there was an error actually updating the game"));
+            return;
+        }
+        updateGames(gameID,gameData.game());
+        if(msg != null){
+            connections.broadcast(gameID,null,msg);
+        }
     }
 
     private void leave(int gameID, String authToken, Session session) throws IOException{
@@ -90,7 +141,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void connect(int gameID, String authToken, Session session) throws IOException{
+    private void connect(int gameID, String authToken, ChessGame.TeamColor color, Session session) throws IOException{
         System.out.println("This is a connect command");
 
         AuthData authData = validateAndGetUser(authToken);
@@ -102,8 +153,21 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         GameData gameData = getGameData(gameID);
         if(gameData == null){
             respond(session, new ErrorMessage("Error: invalid game ID"));
+            return;
         }
 
+        connections.addToGame(gameID,session);
+        NotificationMessage message;
+        if(color == ChessGame.TeamColor.WHITE || Objects.equals(authData.username(), gameData.whiteUsername())){
+            message = new NotificationMessage(authData.username() + " joined the game as WHITE");
+        }
+        else if(color == ChessGame.TeamColor.BLACK || Objects.equals(authData.username(), gameData.blackUsername())){
+            message = new NotificationMessage(authData.username() + " joined the game as BLACK");
+        }
+        else {
+            message = new NotificationMessage(authData.username() + " joined the game as an observer");
+        }
+        connections.broadcast(gameID,session, message);
 
     }
 
@@ -113,13 +177,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
 
-    private void updateGames(int gameID, ChessGame game) throws Exception {
-        try {
-            var notification = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
-            connections.broadcast(gameID, null, notification);
-        } catch (Exception ex) {
-            throw new Exception(ex.getMessage());
-        }
+    private void updateGames(int gameID, ChessGame game)  throws  IOException{
+        var notification = new LoadGameMessage(ServerMessage.ServerMessageType.LOAD_GAME, game);
+        connections.broadcast(gameID, null, notification);
     }
 
     private void respond(Session session, ServerMessage message) throws IOException {
@@ -157,4 +217,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         return game.whiteUsername().equals(data.username()) || game.blackUsername().equals(data.username());
     }
 
+//    private void sendMoveNotifications(ChessGame.TeamColor color, ChessGame game){
+//        if(game.isInCheckmate(color)){
+//
+//        }
+//    }
 }
