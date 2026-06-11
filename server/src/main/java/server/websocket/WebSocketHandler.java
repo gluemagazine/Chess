@@ -169,6 +169,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
         connections.broadcast(gameID,session, message);
 
+        respond(session,new LoadGameMessage(gameData.game()));
     }
 
     @Override
