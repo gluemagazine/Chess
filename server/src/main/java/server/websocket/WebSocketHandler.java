@@ -113,8 +113,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             }
             bundle.gameDAO.updateGame(String.valueOf(gameID),gameData.updateGame(game));
         } catch (InvalidMoveException e) {
-            System.out.println(game);
-            System.out.println(move);
+//            System.out.println(game);
+//            System.out.println(move);
             respond(session, new ErrorMessage("Error: invalid move!"));
             return;
         } catch (DataAccessException ex){
@@ -182,6 +182,34 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             respond(session,new ErrorMessage("Error: unauthorized"));
             return;
         }
+
+        GameData gameData = getGameData(gameID);
+        if(gameData == null){
+            respond(session, new ErrorMessage("Error: invalid game ID"));
+            return;
+        }
+
+        ChessGame game = gameData.game();
+
+        if(game.getGameOver()){
+            respond(session, new ErrorMessage("Error: game already over!"));
+            return;
+        }
+
+        if(!data.username().equals(gameData.blackUsername()) && !data.username().equals(gameData.whiteUsername())){
+            respond(session,new ErrorMessage("Error: observers cannot resign!"));
+            return;
+        }
+
+        game.setGameOver(true);
+
+        try {
+            bundle.gameDAO.updateGame(String.valueOf(gameID),gameData.updateGame(game));
+        } catch (DataAccessException e) {
+            throw new IOException(e);
+        }
+
+        connections.broadcast(gameID,null,new NotificationMessage(data.username() + " resigned"));
     }
 
     private void connect(int gameID, String authToken, ChessGame.TeamColor color, Session session) throws IOException{
@@ -260,10 +288,4 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private boolean canAct(GameData game, AuthData data){
         return game.whiteUsername().equals(data.username()) || game.blackUsername().equals(data.username());
     }
-
-//    private void sendMoveNotifications(ChessGame.TeamColor color, ChessGame game){
-//        if(game.isInCheckmate(color)){
-//
-//        }
-//    }
 }
