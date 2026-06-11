@@ -3,32 +3,32 @@ package server;
 import dataaccess.*;
 import io.javalin.*;
 import server.handlers.*;
+import server.websocket.WebSocketHandler;
 import service.*;
 
 public class Server {
 
     private final Javalin javalin;
 
-    private final UserService users;
-    private final DataService auth;
-    private final GameService games;
-
     public Server() {
         DataAccessBundle bundle = new DataAccessBundle(false);
 
-        users = new UserService(bundle.userDAO,bundle.authDAO);
-        auth = new DataService(bundle.authDAO,bundle.gameDAO,bundle.userDAO);
-        games = new GameService(bundle.gameDAO,bundle.authDAO,bundle.userDAO);
+        UserService users = new UserService(bundle.userDAO, bundle.authDAO);
+        DataService auth = new DataService(bundle.authDAO, bundle.gameDAO, bundle.userDAO);
+        GameService games = new GameService(bundle.gameDAO, bundle.authDAO, bundle.userDAO);
+
+        WebSocketHandler webSocketHandler = new WebSocketHandler(bundle);
 
         // Register your endpoints and exception handlers here.
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
-        javalin.post("/user", new RegisterHandler(users,auth,games));
-        javalin.post("/session", new LoginHandler(users,auth,games));
-        javalin.delete("/session", new LogOutHandler(users,auth,games));
-        javalin.get("/game", new ListGamesHandler(users,auth,games));
-        javalin.post("/game", new CreateGameHandler(users,auth,games));
-        javalin.put("/game", new JoinGameHandler(users,auth,games));
-        javalin.delete("/db", new DeleteDBHandler(users,auth,games));
+        javalin.post("/user", new RegisterHandler(users, auth, games));
+        javalin.post("/session", new LoginHandler(users, auth, games));
+        javalin.delete("/session", new LogOutHandler(users, auth, games));
+        javalin.get("/game", new ListGamesHandler(users, auth, games));
+        javalin.post("/game", new CreateGameHandler(users, auth, games));
+        javalin.put("/game", new JoinGameHandler(users, auth, games));
+        javalin.delete("/db", new DeleteDBHandler(users, auth, games));
+
     }
 
     public int run(int desiredPort) {
