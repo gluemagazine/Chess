@@ -44,10 +44,18 @@ public class Client {
     private ClientStates state;
     private final ServerFacade server;
     private String authToken = null;
+    private final WebSocketFacade socket;
+    private final InGameClient inGameClient;
 
     public Client(String url){
         state = ClientStates.LOGGED_OUT;
         server = new ServerFacade(url);
+        try {
+            socket = new WebSocketFacade(url,null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        inGameClient = new InGameClient(socket);
         new Repl(loggedOutHelp,this);
     }
 
@@ -249,7 +257,7 @@ public class Client {
             }
             server.joinGame(new JoinGameRequest(authToken,teamColor, String.valueOf(listedGames.get(id-1))));
             System.out.println("Successfully joined game " + id);
-            new InGameClient(new ChessGame(), teamColor);
+            inGameClient.join(id,authToken,teamColor);
         } catch(Throwable e){
             System.out.print(SET_TEXT_COLOR_RED);
 
@@ -311,7 +319,7 @@ public class Client {
     }
 
     private void observeGame(int id){
-        new InGameClient(new ChessGame(), ChessGame.TeamColor.WHITE);
+        inGameClient.join(id,authToken,null);
     }
 
     public ClientStates getClientState(){
