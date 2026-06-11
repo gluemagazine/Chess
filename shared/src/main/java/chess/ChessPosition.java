@@ -17,6 +17,22 @@ public class ChessPosition {
         this.col = col;
     }
 
+    public ChessPosition(String letterForm){
+        this.row = switch(letterForm.substring(0,1).toUpperCase()){
+            case "A" -> 1;
+            case "B" -> 2;
+            case "C" -> 3;
+            case "D" -> 4;
+            case "E" -> 5;
+            case "F" -> 6;
+            case "G" -> 7;
+            case "H" -> 8;
+            default -> -1;
+        };
+        this.col = Integer.parseInt(letterForm.substring(1));
+    }
+
+
     /**
      * @return which row this position is in
      * 1 codes for the bottom row
