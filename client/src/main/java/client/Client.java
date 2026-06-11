@@ -50,12 +50,13 @@ public class Client {
     public Client(String url){
         state = ClientStates.LOGGED_OUT;
         server = new ServerFacade(url);
+        inGameClient = new InGameClient();
         try {
-            socket = new WebSocketFacade(url,null);
+            socket = new WebSocketFacade(url,inGameClient);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        inGameClient = new InGameClient(socket);
+        inGameClient.setSocket(socket);
         new Repl(loggedOutHelp,this);
     }
 
@@ -256,7 +257,7 @@ public class Client {
                 return;
             }
             server.joinGame(new JoinGameRequest(authToken,teamColor, String.valueOf(listedGames.get(id-1))));
-            System.out.println("Successfully joined game " + id);
+            System.out.println("Successfully joined game " + id + " as " + teamColor);
             inGameClient.join(id,authToken,teamColor);
         } catch(Throwable e){
             System.out.print(SET_TEXT_COLOR_RED);

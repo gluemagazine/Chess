@@ -1,18 +1,21 @@
 package client;
 
 import chess.ChessGame;
-import com.google.gson.Gson;
+import chess.ChessPosition;
 import ui.BoardPrinter;
+import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
-import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
-import static ui.EscapeSequences.SET_TEXT_COLOR_YELLOW;
+import static ui.EscapeSequences.*;
 
 public class InGameClient implements ServerMessageObserver{
 
     String invalidCommand = SET_TEXT_COLOR_RED + "Invalid command or arguments, type \"help\" to get a list of valid commands and parameters.";
 
-    private String normalHelp =
+    private final String normalHelp =
             """ 
             redraw - the current chess board
             leave - the game
@@ -21,7 +24,7 @@ public class InGameClient implements ServerMessageObserver{
             highlight <Position> - shows all legal moves at the given position. Positions are <A-H><1-8>
             help - display all current valid commands""";
 
-    private String observingHelp =
+    private final String observingHelp =
             """ 
             redraw - the current chess board
             leave - the game
@@ -31,21 +34,30 @@ public class InGameClient implements ServerMessageObserver{
 
 
     private final BoardPrinter printer = new BoardPrinter();
-    private final WebSocketFacade socket;
-    private boolean observing;
+    private WebSocketFacade socket;
     private boolean hasLeft = false;
     private ChessGame game;
     private ChessGame.TeamColor color;
+    private int gameID;
+    private String authToken;
 
-    public InGameClient(WebSocketFacade socket){
-        this.socket = socket;
-
+    public InGameClient(){
     }
 
     @Override
     public void notify(ServerMessage message) {
-        System.out.print(message);
-        System.out.print("\n\n[IN_GAME] >>>");
+        if(message.getClass() == LoadGameMessage.class){
+            game = ((LoadGameMessage) message).getGame();
+            System.out.println();
+            redraw();
+        }
+        else if(message.getClass() == NotificationMessage.class){
+            System.out.print(((NotificationMessage) message).getMessage());
+        }
+        else if(message.getClass() == ErrorMessage.class){
+            System.out.print(SET_TEXT_COLOR_RED + ((ErrorMessage) message).getMessage());
+        }
+        System.out.print(RESET_BG_COLOR + RESET_TEXT_COLOR + "\n[IN_GAME] >>> ");
     }
 
     public void processInput(String input){
@@ -79,6 +91,20 @@ public class InGameClient implements ServerMessageObserver{
                     }
                     redraw();
                     break;
+                case "move":
+                    if ((params.length != 3)) {
+                        System.out.println(SET_TEXT_COLOR_RED + "Too many or not enough parameters for move");
+                        break;
+                    }
+                    makeMove();
+                    break;
+                case "highlight":
+                    if ((params.length != 2)) {
+                        System.out.println(SET_TEXT_COLOR_YELLOW + "Too many or not enough parameters for move");
+                        break;
+                    }
+                    highlightSquare(new ChessPosition(params[1]));
+                    break;
                 default:
                     System.out.println(invalidCommand);
             }
@@ -87,21 +113,24 @@ public class InGameClient implements ServerMessageObserver{
         }
     }
 
-    private void printGame(ChessGame game, ChessGame.TeamColor color){
-        printer.printChessBoard(game,color);
-    }
-
     public void join(int gameID, String authToken, ChessGame.TeamColor color){
         String helpText = (color == null) ? observingHelp : normalHelp;
         this.color = (color != null) ? color : ChessGame.TeamColor.WHITE;
+        this.gameID = gameID;
+        this.authToken = authToken;
+        hasLeft = false;
+        connect(gameID,authToken);
         new InGameRepl(helpText,this);
     }
 
     private void connect(int gameID, String authToken){
-        socket.connect(gameID,authToken);
+        UserGameCommand request = new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken,gameID);
+        socket.sendCommand(request);
     }
 
     private void resign(){
+        UserGameCommand request = new UserGameCommand(UserGameCommand.CommandType.RESIGN,authToken,gameID);
+        socket.sendCommand(request);
 
     }
 
@@ -109,7 +138,7 @@ public class InGameClient implements ServerMessageObserver{
         printer.printChessBoard(game,color);
     }
 
-    private void highlightSquare(){
+    private void highlightSquare(ChessPosition pos){
 
     }
 
@@ -118,11 +147,15 @@ public class InGameClient implements ServerMessageObserver{
     }
 
     private void leave(){
-
+        UserGameCommand request = new UserGameCommand(UserGameCommand.CommandType.LEAVE,authToken,gameID);
+        socket.sendCommand(request);
         hasLeft = true;
     }
 
     public boolean getHasLeft(){
         return hasLeft;
+    }
+    public void setSocket(WebSocketFacade socket){
+        this.socket = socket;
     }
 }
