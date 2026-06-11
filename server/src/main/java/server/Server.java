@@ -28,6 +28,11 @@ public class Server {
         javalin.post("/game", new CreateGameHandler(users, auth, games));
         javalin.put("/game", new JoinGameHandler(users, auth, games));
         javalin.delete("/db", new DeleteDBHandler(users, auth, games));
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
 
     }
 

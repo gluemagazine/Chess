@@ -1,7 +1,7 @@
 package server.websocket;
 
 
-import jakarta.websocket.Session;
+import org.eclipse.jetty.websocket.api.Session;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class ConnectionManager {
         for (Session c : sessions.get(gameID)) {
             if (c.isOpen()) {
                 if (!c.equals(excludeSession)) {
-                    c.getBasicRemote().sendText(msg);
+                    c.getRemote().sendString(msg);
                 }
             }
         }
