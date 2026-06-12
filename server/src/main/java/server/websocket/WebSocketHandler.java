@@ -113,7 +113,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 msg = new NotificationMessage(username + " is in check");
             } else if(game.isInStalemate(game.getTeamTurn())){
                 game.setGameOver(true);
-                msg = new NotificationMessage(game.getTeamTurn() + " is in a stalemate");
+                msg = new NotificationMessage(username + " is in a stalemate");
             }
             bundle.gameDAO.updateGame(String.valueOf(gameID),gameData.updateGame(game));
         } catch (InvalidMoveException e) {
