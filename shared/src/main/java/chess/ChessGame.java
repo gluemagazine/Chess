@@ -13,12 +13,10 @@ public class ChessGame {
 
     private ChessBoard board;
     private TeamColor turn;
-    final private HashSet<ChessPosition> blackPieces;
-    final private HashSet<ChessPosition> whitePieces;
+    final  HashSet<ChessPosition> blackPieces;
+    final  HashSet<ChessPosition> whitePieces;
     private ChessPosition whiteKing;
     private ChessPosition blackKing;
-    final private HashSet<ChessPosition> blackCastles;
-    final private HashSet<ChessPosition> whiteCastles;
     private boolean gameOver = false;
 
 
@@ -29,12 +27,6 @@ public class ChessGame {
         ChessBoard newBoard = new ChessBoard();
         newBoard.resetBoard();
         setBoard(newBoard);
-        blackCastles = new HashSet<>();
-        blackCastles.add(new ChessPosition(8,1));
-        blackCastles.add(new ChessPosition(8,8));
-        whiteCastles = new HashSet<>();
-        whiteCastles.add(new ChessPosition(1,1));
-        whiteCastles.add(new ChessPosition(1,8));
     }
 
     /**
@@ -232,7 +224,7 @@ public class ChessGame {
             }
         }
         if(!isValid){
-            throw new InvalidMoveException(String.format("%s is not a valid move",move));
+            throw new InvalidMoveException(String.format("%s is not a valid move: bad move",move));
         }
         if (move.getPromotionPiece() == null){
             board.setPiece(move.getEndPosition(),piece);
@@ -243,10 +235,10 @@ public class ChessGame {
             board.setPiece(move.getStartPosition(),null);
         }
 
-        if(isInCheck(turn)){
-            board = prev;
-            throw new InvalidMoveException(String.format("%s is not a valid move",move));
-        }
+//        if(isInCheck(turn)){
+//            board = prev;
+//            throw new InvalidMoveException(String.format("%s is not a valid move: still in check",move));
+//        }
         updatePieces(board);
         if(piece.getPieceType() == ChessPiece.PieceType.PAWN){
             if(board.getBlackEnPasant().equals( move.getEndPosition())){
@@ -264,13 +256,6 @@ public class ChessGame {
             }
         }
         setTeamTurn((turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE);
-
-        if (move.getStartPosition() == blackKing){
-            blackCastles.clear();
-        }
-        if (move.getStartPosition() == whiteKing){
-            whiteCastles.clear();
-        }
     }
 
     /**
@@ -345,24 +330,17 @@ public class ChessGame {
             return false;
         }
 
-        if( teamColor == TeamColor.BLACK){
-            for(var pos : blackPieces){
-                Collection<ChessMove> possible = validMoves(pos);
-                if(possible.isEmpty()){
-                    continue;
-                }
-                return false;
+        HashSet<ChessPosition> original = (teamColor == TeamColor.BLACK) ? blackPieces : whitePieces;
+        ArrayList<ChessPosition> pieces = new ArrayList<>(original);
+
+        for(var pos : pieces){
+            Collection<ChessMove> possible = validMoves(pos);
+            if(possible.isEmpty()){
+                continue;
             }
+            return false;
         }
-        else{
-            for(var pos : whitePieces){
-                Collection<ChessMove> possible = validMoves(pos);
-                if(possible.isEmpty()){
-                    continue;
-                }
-                return false;
-            }
-        }
+
         return true;
     }
 
@@ -438,6 +416,13 @@ public class ChessGame {
         return "ChessGame{" +
                 "board=" + board +
                 ", turn=" + turn +
+                ", gameOver=" + gameOver +
+                ", \nblackKing=" + blackKing +
+                ", whiteKing=" + whiteKing +
+                ", \nwhitePieces=" + whitePieces +
+                ", \nblackPieces=" + blackPieces +
+                ", \nThreatened by white=" + getThreatened(board,TeamColor.WHITE,false) +
+                ", \nThreatened by black=" + getThreatened(board,TeamColor.BLACK,false) +
                 '}';
     }
 }

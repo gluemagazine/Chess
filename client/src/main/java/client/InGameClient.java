@@ -136,13 +136,19 @@ public class InGameClient implements ServerMessageObserver{
     }
 
     private void resign(){
+        System.out.println("Are you SURE you want to resign? (Y/N)");
+        Scanner in = new Scanner(System.in);
+        String response = in.nextLine();
+        if(!response.strip().equalsIgnoreCase("Y")){
+            return;
+        }
         UserGameCommand request = new UserResignCommand(UserGameCommand.CommandType.RESIGN,authToken,gameID,(color == null));
         socket.sendCommand(request);
-
     }
 
     private void redraw(){
         printer.printChessBoard(game,color);
+        System.out.println();
     }
 
     private void highlightSquare(ChessPosition pos){
@@ -158,6 +164,10 @@ public class InGameClient implements ServerMessageObserver{
     private void makeMove(ChessPosition start, ChessPosition end){
         ChessMove move;
         ChessPiece piece = game.getBoard().getPiece(start);
+        if(piece.getTeamColor() != color){
+            System.out.println(SET_TEXT_COLOR_RED + "Error: You cannot move another player's piece");
+            return;
+        }
         if(piece.getPieceType() == ChessPiece.PieceType.PAWN){
             move = new ChessMove(start,end,getPromotion(start,end,color));
         }

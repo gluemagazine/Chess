@@ -105,20 +105,22 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         NotificationMessage msg = null;
         try {
             game.makeMove(move);
+            String username = (game.getTeamTurn() == ChessGame.TeamColor.WHITE) ? gameData.whiteUsername() : gameData.blackUsername();
             if(game.isInCheckmate(game.getTeamTurn())){
                 game.setGameOver(true);
-                msg = new NotificationMessage(game.getTeamTurn() + " is in checkmate");
+                msg = new NotificationMessage(username + " is in checkmate");
             } else if(game.isInCheck(game.getTeamTurn())){
-                msg = new NotificationMessage(game.getTeamTurn() + " is in check");
+                msg = new NotificationMessage(username + " is in check");
             } else if(game.isInStalemate(game.getTeamTurn())){
                 game.setGameOver(true);
                 msg = new NotificationMessage(game.getTeamTurn() + " is in a stalemate");
             }
             bundle.gameDAO.updateGame(String.valueOf(gameID),gameData.updateGame(game));
         } catch (InvalidMoveException e) {
-//            System.out.println(game);
-//            System.out.println(move);
-            respond(session, new ErrorMessage("Error: invalid move!"));
+            System.out.println(game);
+            System.out.println(move);
+            System.out.println(game.validMoves(move.getStartPosition()));
+            respond(session, new ErrorMessage("Error: invalid move: " + e.getMessage()));
             return;
         } catch (DataAccessException ex){
             respond(session, new ErrorMessage("Error: there was an error actually updating the game"));
