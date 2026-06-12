@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
-public class InGameRepl {
+public class InGameRepl extends ReplParent{
 
     private final String help;
     private final InGameClient client;
@@ -31,14 +31,6 @@ public class InGameRepl {
             }
 
             client.processInput(input);
-        }
-    }
-
-    private void printAlternating(String toPrint){
-        String[] split = toPrint.split("\n");
-        for(var line : split){
-            var pieces = line.split( "-");
-            System.out.println(pieces[0] + SET_TEXT_COLOR_LIGHT_GREY + "-" + pieces[1] + RESET_TEXT_COLOR);
         }
     }
 }
