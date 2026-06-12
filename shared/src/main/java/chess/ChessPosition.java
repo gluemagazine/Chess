@@ -18,7 +18,7 @@ public class ChessPosition {
     }
 
     public ChessPosition(String letterForm){
-        this.row = switch(letterForm.substring(0,1).toUpperCase()){
+        this.col = switch(letterForm.substring(0,1).toUpperCase()){
             case "A" -> 1;
             case "B" -> 2;
             case "C" -> 3;
@@ -29,7 +29,7 @@ public class ChessPosition {
             case "H" -> 8;
             default -> -1;
         };
-        this.col = Integer.parseInt(letterForm.substring(1));
+        this.row = Integer.parseInt(letterForm.substring(1));
     }
 
 

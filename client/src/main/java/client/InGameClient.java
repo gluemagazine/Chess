@@ -1,6 +1,8 @@
 package client;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import ui.BoardPrinter;
 import websocket.commands.UserGameCommand;
@@ -8,6 +10,9 @@ import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
+
+import java.util.ArrayList;
+import java.util.Scanner;
 
 import static ui.EscapeSequences.*;
 
@@ -100,7 +105,7 @@ public class InGameClient implements ServerMessageObserver{
                     break;
                 case "highlight":
                     if ((params.length != 2)) {
-                        System.out.println(SET_TEXT_COLOR_YELLOW + "Too many or not enough parameters for move");
+                        System.out.println(SET_TEXT_COLOR_RED + "Too many or not enough parameters for move");
                         break;
                     }
                     highlightSquare(new ChessPosition(params[1]));
@@ -139,11 +144,40 @@ public class InGameClient implements ServerMessageObserver{
     }
 
     private void highlightSquare(ChessPosition pos){
-
+        ArrayList<ChessMove> validMoves = (ArrayList<ChessMove>) game.validMoves(pos);
+        ArrayList<ChessPosition> toHighlight = new ArrayList<>();
+        toHighlight.add(pos);
+        for (var move : validMoves){
+            toHighlight.add(move.getEndPosition());
+        }
+        printer.printHighlighted(game,color,toHighlight);
     }
 
     private void makeMove(){
 
+    }
+
+    private ChessPiece.PieceType getPromotion(ChessPosition end, ChessGame.TeamColor color){
+        int targetRow = (color == ChessGame.TeamColor.WHITE) ? 8 : 1;
+        if(end.getRow() != targetRow){
+            return null;
+        }
+        ChessPiece.PieceType result = null;
+        Scanner in = new Scanner(System.in);
+        while(result == null){
+            System.out.print("[IN_GAME]>>> What piece do you want? (B,Q,K,R)");
+            result = switch(in.nextLine().strip().toUpperCase()){
+                case "R" -> ChessPiece.PieceType.ROOK;
+                case "Q" -> ChessPiece.PieceType.QUEEN;
+                case "B" -> ChessPiece.PieceType.BISHOP;
+                case "K" -> ChessPiece.PieceType.KNIGHT;
+                default -> null;
+            };
+            if(result == null){
+                System.out.println("Please enter a valid piece type");
+            }
+        }
+        return result;
     }
 
     private void leave(){

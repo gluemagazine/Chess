@@ -89,6 +89,8 @@ public class Client {
                     if ((params.length == 3)) {
                         if(validID(params[1])){
                             joinGame(Integer.parseInt(params[1]),params[2]);
+                        } else {
+                            System.out.println(SET_TEXT_COLOR_RED + "Please provide a valid game ID");
                         }
                     } else {
                         System.out.println(SET_TEXT_COLOR_RED + "Not enough or too many arguments given to join a game");
