@@ -13,6 +13,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import websocket.commands.UserGameCommand;
 import websocket.commands.UserJoinGameCommand;
 import websocket.commands.UserMakeMoveCommand;
+import websocket.commands.UserResignCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -48,10 +49,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 UserJoinGameCommand newCommand = new Gson().fromJson(ctx.message(), UserJoinGameCommand.class);
                 connect(newCommand.getGameID(), newCommand.getAuthToken(), newCommand.getColor() ,ctx.session);
             }
+            else if(command.getCommandType() == UserGameCommand.CommandType.RESIGN){
+                UserResignCommand newCommand = new Gson().fromJson(ctx.message(), UserResignCommand.class);
+                resign(command.getGameID(),command.getAuthToken(),ctx.session,newCommand.getObserving());
+            }
             else {
                 switch (command.getCommandType()) {
                     case LEAVE -> leave(command.getGameID(),command.getAuthToken(),ctx.session);
-                    case RESIGN -> resign(command.getGameID(),command.getAuthToken(),ctx.session);
                 }
             }
 
@@ -105,7 +109,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 game.setGameOver(true);
                 msg = new NotificationMessage(game.getTeamTurn() + " is in checkmate");
             } else if(game.isInCheck(game.getTeamTurn())){
-                game.setGameOver(true);
                 msg = new NotificationMessage(game.getTeamTurn() + " is in check");
             } else if(game.isInStalemate(game.getTeamTurn())){
                 game.setGameOver(true);
@@ -174,7 +177,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         connections.broadcast(gameID,session, message);
     }
 
-    private void resign(int gameID, String authToken, Session session) throws IOException{
+    private void resign(int gameID, String authToken, Session session, boolean observing) throws IOException{
         System.out.println("This is a resign command");
 
         AuthData data = validateAndGetUser(authToken);
@@ -196,7 +199,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             return;
         }
 
-        if(!data.username().equals(gameData.blackUsername()) && !data.username().equals(gameData.whiteUsername())){
+        if(observing || (!data.username().equals(gameData.blackUsername()) && !data.username().equals(gameData.whiteUsername()))){
             respond(session,new ErrorMessage("Error: observers cannot resign!"));
             return;
         }

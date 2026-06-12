@@ -51,7 +51,7 @@ public class ChessPosition {
 
 
     public String getLetterMove(){
-        String letter = switch (row) {
+        String letter = switch (col) {
             case 1 -> "A";
             case 2 -> "B";
             case 3 -> "C";
@@ -62,7 +62,7 @@ public class ChessPosition {
             case 8 -> "H";
             default -> "";
         };
-        return letter + col;
+        return letter + row;
     }
 
     @Override

@@ -6,6 +6,8 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import ui.BoardPrinter;
 import websocket.commands.UserGameCommand;
+import websocket.commands.UserMakeMoveCommand;
+import websocket.commands.UserResignCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
@@ -101,7 +103,7 @@ public class InGameClient implements ServerMessageObserver{
                         System.out.println(SET_TEXT_COLOR_RED + "Too many or not enough parameters for move");
                         break;
                     }
-                    makeMove();
+                    makeMove(new ChessPosition(params[1]), new ChessPosition(params[2]));
                     break;
                 case "highlight":
                     if ((params.length != 2)) {
@@ -134,7 +136,7 @@ public class InGameClient implements ServerMessageObserver{
     }
 
     private void resign(){
-        UserGameCommand request = new UserGameCommand(UserGameCommand.CommandType.RESIGN,authToken,gameID);
+        UserGameCommand request = new UserResignCommand(UserGameCommand.CommandType.RESIGN,authToken,gameID,(color == null));
         socket.sendCommand(request);
 
     }
@@ -153,16 +155,30 @@ public class InGameClient implements ServerMessageObserver{
         printer.printHighlighted(game,color,toHighlight);
     }
 
-    private void makeMove(){
-
+    private void makeMove(ChessPosition start, ChessPosition end){
+        ChessMove move;
+        ChessPiece piece = game.getBoard().getPiece(start);
+        if(piece.getPieceType() == ChessPiece.PieceType.PAWN){
+            move = new ChessMove(start,end,getPromotion(start,end,color));
+        }
+        else {
+            move = new ChessMove(start,end,null);
+        }
+        UserMakeMoveCommand makeMove = new UserMakeMoveCommand(UserGameCommand.CommandType.MAKE_MOVE,authToken,gameID,move,color);
+        socket.sendCommand(makeMove);
     }
 
-    private ChessPiece.PieceType getPromotion(ChessPosition end, ChessGame.TeamColor color){
+    private ChessPiece.PieceType getPromotion(ChessPosition start,ChessPosition end, ChessGame.TeamColor color){
         int targetRow = (color == ChessGame.TeamColor.WHITE) ? 8 : 1;
         if(end.getRow() != targetRow){
             return null;
         }
         ChessPiece.PieceType result = null;
+        ArrayList<ChessMove> validMoves = (ArrayList<ChessMove>) game.validMoves(start);
+        ChessMove testMove = new ChessMove(start,end, ChessPiece.PieceType.QUEEN);
+        if(!validMoves.contains(testMove)){
+            return null;
+        }
         Scanner in = new Scanner(System.in);
         while(result == null){
             System.out.print("[IN_GAME]>>> What piece do you want? (B,Q,K,R)");
